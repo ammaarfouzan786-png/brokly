@@ -1,0 +1,63 @@
+%% Brokly — system architecture
+%% Render at https://mermaid.live or via any Mermaid-aware viewer.
+flowchart TB
+    subgraph Client["Client"]
+        Web["Web App (Next.js)"]
+    end
+
+    subgraph Edge["Edge / BFF"]
+        GW["API Gateway / BFF"]
+        WS["WebSocket Gateway"]
+    end
+
+    subgraph Services["Core Services"]
+        Auth["Auth & Accounts"]
+        KYC["KYC / Compliance"]
+        Fund["Funding & Payments"]
+        MD["Market Data"]
+        Ord["Orders & Execution"]
+        Port["Portfolio & Reporting"]
+        Notif["Notifications"]
+    end
+
+    subgraph Data["Data & Messaging"]
+        PG[("PostgreSQL")]
+        Redis[("Redis")]
+        Bus{{"Event Bus"}}
+    end
+
+    subgraph External["External Providers"]
+        MDP["Market Data Provider"]
+        LP["Liquidity / Broker-Dealer"]
+        Pay["Payment Processor"]
+        KP["KYC Provider"]
+    end
+
+    Web -->|HTTPS| GW
+    Web <-->|WSS quotes/fills| WS
+
+    GW --> Auth
+    GW --> KYC
+    GW --> Fund
+    GW --> Ord
+    GW --> Port
+    WS --> MD
+
+    Auth --> PG
+    KYC --> PG
+    Fund --> PG
+    Ord --> PG
+    Port --> PG
+
+    MD --> Redis
+    Ord --> Redis
+
+    Ord --> Bus
+    Fund --> Bus
+    Bus --> Port
+    Bus --> Notif
+
+    KYC --> KP
+    Fund --> Pay
+    MD --> MDP
+    Ord --> LP

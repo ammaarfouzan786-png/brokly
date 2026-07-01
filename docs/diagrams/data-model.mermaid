@@ -1,0 +1,79 @@
+%% Brokly — core data model
+erDiagram
+    USER ||--o{ ACCOUNT : owns
+    USER ||--|| KYC_RECORD : has
+    ACCOUNT ||--o{ ORDER : places
+    ACCOUNT ||--o{ POSITION : holds
+    ACCOUNT ||--o{ LEDGER_ENTRY : records
+    ACCOUNT ||--o{ FUNDING_TX : has
+    INSTRUMENT ||--o{ ORDER : "traded in"
+    INSTRUMENT ||--o{ POSITION : "held as"
+    ORDER ||--o{ FILL : produces
+
+    USER {
+        uuid id PK
+        string email
+        string password_hash
+        datetime created_at
+    }
+    KYC_RECORD {
+        uuid id PK
+        uuid user_id FK
+        string status
+        string provider_ref
+        datetime verified_at
+    }
+    ACCOUNT {
+        uuid id PK
+        uuid user_id FK
+        string base_currency
+        bigint cash_balance_minor
+        string status
+    }
+    INSTRUMENT {
+        uuid id PK
+        string symbol
+        string asset_class
+        int price_scale
+    }
+    ORDER {
+        uuid id PK
+        uuid account_id FK
+        uuid instrument_id FK
+        string side
+        string type
+        bigint qty
+        bigint limit_price_minor
+        string status
+        datetime created_at
+    }
+    FILL {
+        uuid id PK
+        uuid order_id FK
+        bigint qty
+        bigint price_minor
+        datetime executed_at
+    }
+    POSITION {
+        uuid id PK
+        uuid account_id FK
+        uuid instrument_id FK
+        bigint qty
+        bigint avg_cost_minor
+    }
+    LEDGER_ENTRY {
+        uuid id PK
+        uuid account_id FK
+        string type
+        bigint amount_minor
+        string ref
+        datetime created_at
+    }
+    FUNDING_TX {
+        uuid id PK
+        uuid account_id FK
+        string direction
+        bigint amount_minor
+        string status
+        string provider_ref
+    }

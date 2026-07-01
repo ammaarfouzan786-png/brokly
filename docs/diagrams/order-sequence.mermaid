@@ -1,0 +1,25 @@
+%% Brokly — placing an order (happy path)
+sequenceDiagram
+    actor U as User
+    participant Web as Web App
+    participant GW as API Gateway
+    participant Ord as Orders Service
+    participant Risk as Risk / Balance Check
+    participant LP as Liquidity Provider
+    participant Bus as Event Bus
+    participant Port as Portfolio
+    participant Notif as Notifications
+
+    U->>Web: Submit order (symbol, side, qty, type)
+    Web->>GW: POST /orders
+    GW->>Ord: createOrder(...)
+    Ord->>Risk: validate(account, order)
+    Risk-->>Ord: ok (sufficient balance, within limits)
+    Ord->>LP: route(order)
+    LP-->>Ord: fill(price, qty)
+    Ord->>Bus: publish OrderFilled
+    Bus->>Port: update positions & P&L
+    Bus->>Notif: send fill confirmation
+    Ord-->>GW: order (status: filled)
+    GW-->>Web: 201 Created
+    Web-->>U: Show confirmation

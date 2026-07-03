@@ -1,0 +1,41 @@
+%% Brokly — buyer WhatsApp journey: first contact → link → auto-update
+%% Render at https://mermaid.live or any Mermaid-aware viewer.
+sequenceDiagram
+    actor B as Buyer
+    participant WA as WhatsApp
+    participant BR as Brokly (broker app)
+    participant AI as AI (messages.ts)
+    participant L as Share link (/l/…)
+
+    Note over B,BR: First interaction
+    B->>WA: "Looking for a 3BHK villa in Sarjapur"
+    WA->>BR: inbound message (new number → new chat)
+    BR->>AI: firstContactMessages()
+    AI-->>WA: 👋 greeting + ask area / BHK / budget
+    WA-->>B: automated first-contact messages
+
+    Note over B,BR: Brief → matched link
+    B->>WA: shares area, BHK, budget
+    WA->>BR: inbound
+    BR->>AI: briefAckMessage() · suggestReplies()
+    BR->>BR: runMatch() → strongMatches() ranks stock
+    BR->>L: publishLink() (collection tied to the brief)
+    BR->>AI: linkShareMessage(url, count)
+    AI-->>WA: "Here are 2 homes picked for you 👇 <link>"
+    WA-->>B: link message
+
+    Note over B,L: Customer screen
+    B->>L: opens link → BuyerPublic (cards, AI price check)
+    B->>L: taps "I'm interested — enquire"
+    L->>BR: POST /api/enquiry (becomes an AI-scored lead)
+    BR->>AI: enquiryAutoReply()
+    AI-->>WA: instant "noted your interest — visit this weekend?"
+    WA-->>B: enquiry acknowledgement
+
+    Note over BR,L: Link auto-updates later
+    BR->>BR: new matching property listed
+    BR->>L: republish (marks new home isNew, bumps updated)
+    BR->>AI: linkUpdatedMessage(url, newTitle, count)
+    AI-->>WA: "Good news! A new match came in 👇 <link>"
+    WA-->>B: updated-link message
+    B->>L: reopens link → "Updated" banner + NEW badge

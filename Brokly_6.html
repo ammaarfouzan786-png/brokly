@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Brokly — Your whole brokerage. One app.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F5F3; --surface:#FFFFFF; --surface-2:#F7F9F8;
+  --ink:#0E1F18; --ink-2:#56655E; --ink-3:#8A968F;
+  --line:#E5EBE7; --line-2:#EEF2F0;
+  --brand:#0B6B3A; --brand-d:#075029; --brand-soft:#E4F2EA;
+  --money:#12925A; --money-soft:#E1F4EB;
+  --gold:#C98A15; --gold-soft:#FBF0DA;
+  --hot:#E0473C; --hot-soft:#FCE7E5;
+  --ai:#6F58F0; --ai-soft:#ECE8FE;
+  --wa:#1FAD55;
+  --shadow:0 1px 2px rgba(14,31,24,.06),0 8px 24px rgba(14,31,24,.06);
+  --shadow-lg:0 12px 40px rgba(14,31,24,.16);
+  --r:18px; --r-sm:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Inter',system-ui,sans-serif;color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 12% -10%, #E8F0EB 0%, transparent 55%),
+    radial-gradient(1000px 700px at 110% 10%, #EFEAFB 0%, transparent 50%),
+    #E9EEEB;
+  display:flex;align-items:center;justify-content:center;min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+.bricolage{font-family:'Bricolage Grotesque',sans-serif}
+.tnum{font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+
+/* ===== device frame ===== */
+.device{
+  width:430px;max-width:100vw;height:932px;max-height:100vh;
+  background:var(--bg);position:relative;overflow:hidden;
+  border-radius:46px;box-shadow:var(--shadow-lg),0 0 0 11px #0E1F18,0 0 0 13px #243831;
+}
+@media (max-width:480px){.device{border-radius:0;height:100vh;box-shadow:none}}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:128px;height:30px;background:#0E1F18;border-radius:0 0 18px 18px;z-index:60}
+.statusbar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font-size:13px;font-weight:600;z-index:55;color:var(--ink)}
+.statusbar .dots{display:flex;gap:5px;align-items:center}
+.app{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:52px}
+
+/* ===== screens ===== */
+.screens{flex:1;position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:96px;display:none;-webkit-overflow-scrolling:touch}
+.screen.active{display:block;animation:fade .28s ease}
+.screen::-webkit-scrollbar{width:0}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.pad{padding:0 18px}
+.row{display:flex;align-items:center}
+.between{justify-content:space-between}
+.gap8{gap:8px}.gap12{gap:12px}
+.muted{color:var(--ink-2)}
+.tiny{font-size:11px}.sm{font-size:13px}
+
+/* ===== top bar ===== */
+.topbar{padding:8px 18px 14px;display:flex;align-items:center;justify-content:space-between}
+.brandmark{display:flex;align-items:center;gap:9px}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand-d));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Bricolage Grotesque';box-shadow:0 3px 10px rgba(11,107,58,.35)}
+.h-title{font-size:21px;font-weight:700;letter-spacing:-.02em}
+.h-sub{font-size:12px;color:var(--ink-2);margin-top:-1px}
+.iconbtn{width:40px;height:40px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink);box-shadow:var(--shadow);cursor:pointer}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1A7A4E,#0B6B3A);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+.notif-dot{position:relative}
+.notif-dot::after{content:"";position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--hot);border:2px solid var(--surface)}
+
+/* ===== cards ===== */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.section-h{font-size:16px;font-weight:700;letter-spacing:-.01em;margin:22px 18px 12px;display:flex;align-items:center;justify-content:space-between}
+.section-h a{font-size:13px;color:var(--brand);font-weight:600;text-decoration:none}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);white-space:nowrap;cursor:pointer}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.hot{background:var(--hot-soft);color:var(--hot);border-color:transparent}
+.chip.ai{background:var(--ai-soft);color:var(--ai);border-color:transparent}
+.chip.money{background:var(--money-soft);color:var(--money);border-color:transparent}
+.chip.gold{background:var(--gold-soft);color:var(--gold);border-color:transparent}
+.scroller{display:flex;gap:8px;overflow-x:auto;padding:0 18px 2px;scrollbar-width:none}
+.scroller::-webkit-scrollbar{display:none}
+
+/* ===== AI brief ===== */
+.brief{margin:2px 18px 0;border-radius:20px;padding:16px 16px 14px;position:relative;overflow:hidden;color:#fff;
+  background:linear-gradient(135deg,#171033 0%,#3B2A8C 55%,#6F58F0 130%);box-shadow:0 12px 28px rgba(70,46,180,.35)}
+.brief::before{content:"";position:absolute;right:-30px;top:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%)}
+.brief .eyebrow{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.brief h3{font-size:16.5px;font-weight:700;margin:9px 0 6px;line-height:1.3;letter-spacing:-.01em;position:relative}
+.brief p{font-size:13px;line-height:1.5;opacity:.92;position:relative}
+.brief .wave{display:flex;gap:3px;align-items:center;height:14px}
+.brief .wave span{width:3px;border-radius:3px;background:rgba(255,255,255,.85);animation:eq 1.1s ease-in-out infinite}
+.brief .wave span:nth-child(2){animation-delay:.15s}.brief .wave span:nth-child(3){animation-delay:.3s}.brief .wave span:nth-child(4){animation-delay:.45s}.brief .wave span:nth-child(5){animation-delay:.6s}
+@keyframes eq{0%,100%{height:5px}50%{height:14px}}
+.brief-nav{display:flex;gap:6px;margin-top:12px;position:relative}
+.brief-nav button{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.16);border:0;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.brief-dots{display:flex;gap:5px;margin-left:auto;align-items:center}
+.brief-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4)}
+.brief-dots i.on{background:#fff;width:18px;border-radius:3px}
+
+/* ===== stat grid ===== */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 18px 4px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:13px 14px;box-shadow:var(--shadow)}
+.stat .ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:9px}
+.stat .num{font-family:'Bricolage Grotesque';font-size:25px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.stat .lbl{font-size:12px;color:var(--ink-2);margin-top:3px}
+.stat .delta{font-size:11px;font-weight:600;margin-top:6px;display:inline-flex;align-items:center;gap:3px}
+.up{color:var(--money)}.down{color:var(--hot)}
+
+/* ===== tools row ===== */
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:6px 14px}
+.tool{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:14px;cursor:pointer;background:none;border:0}
+.tool .tico{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.tool span{font-size:11px;color:var(--ink-2);font-weight:500;text-align:center;line-height:1.2}
+
+/* ===== priority / activity rows ===== */
+.prow{display:flex;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line-2)}
+.prow:last-child{border-bottom:0}
+.prow .pico{width:38px;height:38px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center}
+.prow .pbody{flex:1;min-width:0}
+.prow .pt{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.prow .ps{font-size:12.5px;color:var(--ink-2);margin-top:2px;line-height:1.4}
+.act-btn{font-size:12px;font-weight:600;padding:7px 13px;border-radius:10px;border:0;cursor:pointer;background:var(--ink);color:#fff;white-space:nowrap}
+.act-btn.ghost{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
+.act-btn.brand{background:var(--brand)}
+.act-btn.wa{background:var(--wa)}
+
+/* ===== bottom nav ===== */
+.nav{position:absolute;left:0;right:0;bottom:0;height:84px;background:rgba(255,255,255,.86);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-around;padding:9px 8px 0;z-index:40}
+.nav .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink-3);cursor:pointer;font-size:10.5px;font-weight:600;padding-top:4px}
+.nav .ni.on{color:var(--brand)}
+.nav .ni svg{width:23px;height:23px}
+.fab{position:absolute;bottom:96px;right:18px;width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,#7A5AF8,#5B3BE0);box-shadow:0 10px 26px rgba(96,60,230,.5);display:flex;align-items:center;justify-content:center;z-index:45;cursor:pointer;border:0}
+.fab svg{width:26px;height:26px;color:#fff}
+
+/* ===== back header ===== */
+.subhead{display:flex;align-items:center;gap:12px;padding:10px 18px 14px}
+.subhead .back{width:38px;height:38px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.subhead h2{font-size:19px;font-weight:700;letter-spacing:-.02em}
+
+/* ===== property cards ===== */
+.plist{padding:6px 18px;display:flex;flex-direction:column;gap:14px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);cursor:pointer}
+.pcard .img{height:160px;position:relative;background-size:cover;background-position:center}
+.pcard .img .badges{position:absolute;top:10px;left:10px;display:flex;gap:6px}
+.pcard .img .cnt{position:absolute;bottom:10px;right:10px;background:rgba(14,31,24,.72);color:#fff;font-size:11px;font-weight:600;padding:4px 9px;border-radius:8px;display:flex;gap:8px;align-items:center}
+.pbadge{background:rgba(255,255,255,.94);color:var(--ink);font-size:11px;font-weight:700;padding:5px 9px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.pbadge.live{background:var(--money);color:#fff}
+.pbadge.cobroke{background:var(--ai);color:#fff}
+.pcard .body{padding:13px 14px}
+.price{font-family:'Bricolage Grotesque';font-size:21px;font-weight:700;letter-spacing:-.02em}
+.persq{font-size:12px;color:var(--ink-2);font-weight:500}
+.spec{display:flex;gap:14px;margin-top:9px;flex-wrap:wrap}
+.spec div{font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:5px}
+.pfoot{display:flex;gap:8px;margin-top:13px}
+.pfoot button{flex:1}
+
+/* ===== leads ===== */
+.lead{display:flex;gap:12px;padding:14px;border-bottom:1px solid var(--line-2);cursor:pointer}
+.lead .lava{width:44px;height:44px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+.score{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.score .sn{font-family:'Bricolage Grotesque';font-size:18px;font-weight:700;line-height:1}
+.score .sl{font-size:10px;color:var(--ink-3);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.bar{height:5px;border-radius:5px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;border-radius:5px}
+
+/* ===== whatsapp ===== */
+.wa-item{display:flex;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line-2);cursor:pointer;align-items:center}
+.wa-item .wava{width:48px;height:48px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;position:relative}
+.wa-item .wb{flex:1;min-width:0}
+.wa-item .wn{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+.wa-item .wm{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.wa-item .wmeta{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.wa-item .wt{font-size:11px;color:var(--ink-3)}
+.unread{background:var(--money);color:#fff;font-size:11px;font-weight:700;min-width:19px;height:19px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.03em}
+
+/* thread */
+.thread{background:linear-gradient(#E9EFEB,#E9EFEB);min-height:100%}
+.bubbles{padding:14px 14px 4px;display:flex;flex-direction:column;gap:8px}
+.bub{max-width:78%;padding:9px 12px;border-radius:14px;font-size:13.5px;line-height:1.45;box-shadow:0 1px 1px rgba(0,0,0,.05);position:relative}
+.bub .bt{font-size:10px;color:var(--ink-3);margin-top:4px;text-align:right}
+.bub.them{background:#fff;align-self:flex-start;border-top-left-radius:4px}
+.bub.me{background:#DCF8C6;align-self:flex-end;border-top-right-radius:4px}
+.ai-suggest{margin:8px 14px 0;background:var(--ai-soft);border:1px solid #DAD2FB;border-radius:14px;padding:12px}
+.ai-suggest .h{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--ai);text-transform:uppercase;letter-spacing:.05em}
+.ai-suggest .txt{font-size:13.5px;color:var(--ink);margin:8px 0 10px;line-height:1.5;background:#fff;border-radius:10px;padding:10px 12px;border:1px solid #E7E1FB}
+.wa-input{display:flex;gap:9px;align-items:center;padding:10px 14px 14px;background:#E9EFEB;position:sticky;bottom:0}
+.wa-input .field{flex:1;background:#fff;border-radius:22px;padding:11px 16px;font-size:13.5px;color:var(--ink-2);border:1px solid var(--line)}
+.wa-send{width:44px;height:44px;border-radius:50%;background:var(--wa);display:flex;align-items:center;justify-content:center;flex:none;border:0;cursor:pointer}
+
+/* ===== co-broking ===== */
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 18px 12px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 14px;border-radius:11px;font-size:13px;font-weight:600;background:var(--surface);border:1px solid var(--line);color:var(--ink-2);white-space:nowrap;cursor:pointer}
+.tab.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.deck{position:relative;height:480px;margin:0 18px}
+.swipecard{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow-lg);overflow:hidden;display:flex;flex-direction:column;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .4s}
+.swipecard .top{height:188px;background-size:cover;background-position:center;position:relative}
+.matchwhy{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(14,31,24,.82);backdrop-filter:blur(6px);color:#fff;border-radius:13px;padding:10px 12px}
+.matchwhy .mh{font-size:11px;font-weight:700;color:#FFD37A;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.04em}
+.matchwhy p{font-size:12.5px;margin-top:4px;line-height:1.4;opacity:.95}
+.swipebody{padding:14px 16px;flex:1;overflow:hidden}
+.brokerline{display:flex;align-items:center;gap:9px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line-2)}
+.bscore{display:inline-flex;align-items:center;gap:5px;background:var(--gold-soft);color:var(--gold);font-size:11px;font-weight:700;padding:4px 9px;border-radius:8px}
+.splitbar{height:34px;border-radius:10px;display:flex;overflow:hidden;margin-top:12px;font-size:12px;font-weight:700;color:#fff}
+.splitbar .a{background:var(--brand);display:flex;align-items:center;justify-content:center}
+.splitbar .b{background:#C9A227;display:flex;align-items:center;justify-content:center}
+.swipe-actions{display:flex;justify-content:center;gap:18px;margin:14px 0 2px}
+.sw-btn{width:60px;height:60px;border-radius:50%;border:0;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);cursor:pointer;background:#fff}
+.sw-btn.skip{color:var(--hot)} .sw-btn.save{color:var(--gold);width:50px;height:50px} .sw-btn.acc{color:#fff;background:var(--money)}
+.locked{margin:0 18px;background:var(--surface);border:1px dashed var(--line);border-radius:18px;padding:28px 22px;text-align:center}
+.lockring{width:64px;height:64px;border-radius:50%;background:var(--brand-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:var(--brand)}
+.oob{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--brand);background:var(--brand-soft);padding:4px 9px;border-radius:7px}
+
+/* ===== money ===== */
+.balance{margin:2px 18px 0;background:linear-gradient(135deg,#0B6B3A,#06472A);border-radius:22px;padding:18px;color:#fff;box-shadow:0 12px 28px rgba(11,107,58,.32);position:relative;overflow:hidden}
+.balance::after{content:"₹";position:absolute;right:-6px;bottom:-26px;font-size:140px;font-family:'Bricolage Grotesque';font-weight:800;opacity:.08}
+.balance .bl{font-size:12px;opacity:.85;font-weight:500}
+.balance .bn{font-family:'Bricolage Grotesque';font-size:34px;font-weight:700;letter-spacing:-.02em;margin-top:3px}
+.balance .brow{display:flex;gap:20px;margin-top:14px}
+.balance .brow div{font-size:11px;opacity:.85}
+.balance .brow b{display:block;font-size:15px;font-weight:700;margin-top:2px}
+.inv{padding:14px;border-bottom:1px solid var(--line-2)}
+.inv .ih{display:flex;justify-content:space-between;align-items:flex-start}
+.inv .iname{font-size:14px;font-weight:600}
+.inv .iamt{font-family:'Bricolage Grotesque';font-size:17px;font-weight:700}
+.track{display:flex;align-items:center;margin-top:13px;gap:0}
+.track .step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
+.track .dot{width:22px;height:22px;border-radius:50%;background:var(--line);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;z-index:2}
+.track .step.done .dot{background:var(--money)}
+.track .step.cur .dot{background:var(--gold)}
+.track .line{position:absolute;top:11px;left:-50%;width:100%;height:2px;background:var(--line);z-index:1}
+.track .step.done .line{background:var(--money)}
+.track .sl{font-size:10px;color:var(--ink-2);font-weight:600}
+
+/* ===== stamp duty calc ===== */
+.calc{margin:6px 18px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.field-l{font-size:12px;font-weight:600;color:var(--ink-2);margin:14px 0 7px;display:block}
+.input{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:15px;font-family:'Inter';font-weight:600;color:var(--ink);background:var(--surface-2)}
+.input:focus{outline:none;border-color:var(--brand);background:#fff}
+.seg{display:flex;gap:6px;margin-top:7px}
+.seg button{flex:1;padding:11px;border-radius:11px;border:1px solid var(--line);background:var(--surface-2);font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer}
+.seg button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.calc-out{margin-top:18px;background:var(--brand-soft);border-radius:16px;padding:16px;border:1px solid #CFE7DA}
+.calc-out .line{display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0;color:var(--ink-2)}
+.calc-out .line b{color:var(--ink);font-weight:600}
+.calc-out .total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed #B9D8C7;margin-top:6px;padding-top:12px}
+.calc-out .total .t{font-size:13px;color:var(--ink-2)}
+.calc-out .total .v{font-family:'Bricolage Grotesque';font-size:26px;font-weight:700;color:var(--brand-d)}
+.save-pill{margin-top:10px;background:#fff;border:1px solid #CFE7DA;border-radius:10px;padding:9px 12px;font-size:12px;color:var(--money);font-weight:600;display:flex;align-items:center;gap:7px}
+
+/* ===== AI sheet ===== */
+.sheet-wrap{position:absolute;inset:0;z-index:80;display:none}
+.sheet-wrap.open{display:block}
+.scrim{position:absolute;inset:0;background:rgba(14,31,24,.45);backdrop-filter:blur(2px);animation:fade .25s}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:26px 26px 0 0;max-height:78%;display:flex;flex-direction:column;animation:up .32s cubic-bezier(.2,.8,.2,1);box-shadow:0 -10px 40px rgba(0,0,0,.2)}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.sheet-grab{width:38px;height:4px;border-radius:3px;background:var(--line);margin:10px auto 4px}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:6px 18px 14px;border-bottom:1px solid var(--line-2)}
+.sheet-head .ab{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#7A5AF8,#5B3BE0);display:flex;align-items:center;justify-content:center;color:#fff}
+.sheet-body{flex:1;overflow-y:auto;padding:16px 18px}
+.ai-msg{display:flex;gap:9px;margin-bottom:14px}
+.ai-msg .ab2{width:28px;height:28px;border-radius:9px;flex:none;background:var(--ai-soft);color:var(--ai);display:flex;align-items:center;justify-content:center}
+.ai-msg .ac{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;border-top-left-radius:4px;padding:12px 13px;font-size:13.5px;line-height:1.5}
+.ai-msg.user{justify-content:flex-end}
+.ai-msg.user .ac{background:var(--brand);color:#fff;border:0;border-radius:14px;border-top-right-radius:4px}
+.qchips{display:flex;gap:8px;overflow-x:auto;padding:10px 18px;border-top:1px solid var(--line-2);scrollbar-width:none}
+.qchips::-webkit-scrollbar{display:none}
+.qchip{white-space:nowrap;padding:9px 13px;border-radius:11px;background:var(--ai-soft);color:var(--ai);font-size:12.5px;font-weight:600;border:0;cursor:pointer}
+.plan-card{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-top:9px;display:flex;gap:10px;align-items:flex-start}
+.plan-card .pt2{font-size:11px;font-weight:700;color:var(--brand);width:50px;flex:none}
+
+/* property card overlay */
+.pc-overlay{position:absolute;inset:0;z-index:90;background:var(--bg);overflow-y:auto;display:none;padding-bottom:30px}
+.pc-overlay.open{display:block;animation:up .35s cubic-bezier(.2,.8,.2,1)}
+.pc-hero{height:280px;position:relative;background-size:cover;background-position:center}
+.pc-hero .pc-close{position:absolute;top:16px;left:16px;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pc-hero .pc-share{position:absolute;top:16px;right:16px;height:40px;padding:0 14px;border-radius:12px;background:rgba(14,31,24,.78);color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+.pc-hero .pc-label{position:absolute;left:14px;bottom:14px;background:rgba(14,31,24,.78);color:#fff;font-size:12px;font-weight:600;padding:7px 12px;border-radius:10px;display:flex;align-items:center;gap:7px}
+.pc-thumbs{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;scrollbar-width:none}
+.pc-thumbs::-webkit-scrollbar{display:none}
+.pc-thumbs .th{flex:none;width:86px;height:64px;border-radius:11px;background-size:cover;background-position:center;position:relative;cursor:pointer;border:2px solid transparent;overflow:hidden}
+.pc-thumbs .th.on{border-color:var(--brand)}
+.pc-thumbs .th span{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:9px;font-weight:600;padding:8px 5px 3px;text-align:center}
+.pc-sec{margin:8px 16px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.pc-grid .g{background:var(--surface-2);border-radius:12px;padding:11px 12px}
+.pc-grid .gv{font-family:'Bricolage Grotesque';font-size:18px;font-weight:700}
+.pc-grid .gl{font-size:11px;color:var(--ink-2);margin-top:2px}
+.dl{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line-2);font-size:13.5px}
+.dl:last-child{border-bottom:0}.dl span{color:var(--ink-2)}.dl b{font-weight:600}
+.amen{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.amen span{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:12px;font-weight:500;color:var(--ink-2)}
+.aiprice{background:linear-gradient(135deg,#171033,#5B3BE0);color:#fff;border-radius:16px;padding:15px;margin-top:4px}
+.aiprice .h{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.85;display:flex;align-items:center;gap:6px}
+.aiprice .verdict{font-size:16px;font-weight:700;margin:8px 0 4px}
+.loc-row{display:flex;align-items:center;gap:10px;padding:9px 0}
+.loc-row .lc{width:34px;height:34px;border-radius:10px;background:var(--brand-soft);color:var(--brand);display:flex;align-items:center;justify-content:center;flex:none}
+.loc-row .ld{font-size:13px;font-weight:600}.loc-row .lt{font-size:11px;color:var(--ink-2)}
+.loc-row .lkm{margin-left:auto;font-size:12px;font-weight:700;color:var(--brand)}
+.broker-cta{margin:8px 16px;background:linear-gradient(135deg,#0B6B3A,#06472A);border-radius:18px;padding:16px;color:#fff}
+.broker-cta .brow{display:flex;align-items:center;gap:12px}
+.broker-cta .bav{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+.broker-cta .bn{font-size:16px;font-weight:700}
+.broker-cta .bb{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.18);font-size:11px;font-weight:700;padding:3px 8px;border-radius:7px;margin-top:4px}
+.broker-cta .bbtns{display:flex;gap:8px;margin-top:14px}
+.broker-cta .bbtns button{flex:1;padding:12px;border-radius:12px;border:0;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.bbtns .wa{background:var(--wa);color:#fff}.bbtns .call{background:#fff;color:var(--brand-d)}.bbtns .visit{background:rgba(255,255,255,.18);color:#fff}
+
+.toast{position:absolute;left:50%;bottom:108px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:12px;z-index:95;opacity:0;transition:.3s;white-space:nowrap;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+svg{stroke-width:2;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots">
+      <svg width="17" height="12" viewBox="0 0 17 12" style="stroke:none;fill:currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+      <svg width="17" height="12" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 4C8 4 4.5 5.5 2 8l10 12L22 8c-2.5-2.5-6-4-10-4z" opacity=".9"/></svg>
+      <svg width="24" height="12" viewBox="0 0 26 13" style="stroke:none"><rect x="0.5" y="0.5" width="21" height="12" rx="3" style="fill:none;stroke:currentColor;opacity:.4"/><rect x="2" y="2" width="16" height="9" rx="1.5" style="fill:currentColor"/><rect x="23" y="4" width="2" height="5" rx="1" style="fill:currentColor;opacity:.5"/></svg>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="screens">
+
+      <!-- ================= HOME ================= -->
+      <section class="screen active" id="s-home">
+        <div class="topbar">
+          <div class="brandmark">
+            <div class="logo">b</div>
+            <div>
+              <div class="h-title">Hello, Ammar</div>
+              <div class="h-sub">Indiranagar · Bengaluru</div>
+            </div>
+          </div>
+          <div class="row gap8">
+            <div class="iconbtn notif-dot" onclick="toast('No new alerts')"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+            <div class="avatar">AK</div>
+          </div>
+        </div>
+
+        <!-- AI brief -->
+        <div class="brief">
+          <div class="row between">
+            <div class="eyebrow"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/></svg> Morning brief</div>
+            <div class="wave"><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <h3 id="brief-h">3 hot leads went cold overnight — and ₹2.4L is sitting unbilled</h3>
+          <p id="brief-p">Priya Menon viewed your Whitefield 3BHK card 4 times but hasn't replied since Friday. Re-engage her first. Your Sobha deal closed 12 days ago and the invoice still isn't sent.</p>
+          <div class="brief-nav">
+            <button onclick="brief(-1)"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button onclick="brief(1)"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+            <div class="brief-dots"><i class="on"></i><i></i><i></i></div>
+          </div>
+        </div>
+
+        <!-- stats -->
+        <div class="stats">
+          <div class="stat">
+            <div class="ico" style="background:var(--brand-soft);color:var(--brand)"><svg width="17" height="17" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
+            <div class="num tnum">34</div><div class="lbl">Active stock</div>
+            <div class="delta up">▲ 4 this week</div>
+          </div>
+          <div class="stat">
+            <div class="ico" style="background:var(--hot-soft);color:var(--hot)"><svg width="17" height="17" viewBox="0 0 24 24"><path d="M12 2s5 4 5 9a5 5 0 0 1-10 0c0-1.5.5-3 1.5-4"/></svg></div>
+            <div class="num tnum">9</div><div class="lbl">Hot leads</div>
+            <div class="delta hot" style="color:var(--hot)">3 need reply now</div>
+          </div>
+          <div class="stat">
+            <div class="ico" style="background:var(--gold-soft);color:var(--gold)"><svg width="17" height="17" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div class="num tnum">₹6.8L</div><div class="lbl">Pending commission</div>
+            <div class="delta hot" style="color:var(--hot)">₹2.4L overdue</div>
+          </div>
+          <div class="stat">
+            <div class="ico" style="background:#E7F0FB;color:#2E72D2"><svg width="17" height="17" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+            <div class="num tnum">3</div><div class="lbl">Visits today</div>
+            <div class="delta up">Optimised route ready</div>
+          </div>
+        </div>
+
+        <!-- tools -->
+        <div class="section-h">Quick tools</div>
+        <div class="tools">
+          <button class="tool" onclick="go('s-money')"><div class="tico" style="background:var(--money-soft);color:var(--money)"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 10h18M3 6h18v12H3zM7 14h2"/></svg></div><span>Invoices</span></button>
+          <button class="tool" onclick="go('s-lawyer')"><div class="tico" style="background:var(--brand-soft);color:var(--brand)"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 3v18M5 7l7-4 7 4M5 7l-2 6a3 3 0 0 0 6 0L7 7M19 7l-2 6a3 3 0 0 0 6 0l-2-6"/></svg></div><span>Stamp duty</span></button>
+          <button class="tool" onclick="go('s-visits')"><div class="tico" style="background:#E7F0FB;color:#2E72D2"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 21s-7-5-7-11a7 7 0 0 1 14 0c0 6-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div><span>Site visits</span></button>
+          <button class="tool" onclick="go('s-marketing')"><div class="tico" style="background:var(--ai-soft);color:var(--ai)"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 11l18-7-7 18-2.5-7.5L3 11z"/></svg></div><span>Marketing</span></button>
+        </div>
+
+        <!-- priority -->
+        <div class="section-h">Priority actions <span style="font-size:12px;color:var(--hot);font-weight:600">4 urgent</span></div>
+        <div class="card pad" style="padding:0;margin:0 18px">
+          <div class="prow">
+            <div class="pico" style="background:var(--hot-soft);color:var(--hot)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <div class="pbody">
+              <div class="pt">Reply to Priya Menon</div>
+              <div class="ps">Viewed Whitefield 3BHK 4× · silent 3 days · intent 88</div>
+            </div>
+            <button class="act-btn wa" onclick="openThread('priya')">Reply</button>
+          </div>
+          <div class="prow">
+            <div class="pico" style="background:var(--gold-soft);color:var(--gold)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div class="pbody">
+              <div class="pt">Invoice Sobha Dream deal</div>
+              <div class="ps">Closed 12 days ago · ₹2.4L commission unbilled</div>
+            </div>
+            <button class="act-btn brand" onclick="go('s-money')">Bill now</button>
+          </div>
+          <div class="prow">
+            <div class="pico" style="background:var(--ai-soft);color:var(--ai)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></div>
+            <div class="pbody">
+              <div class="pt">7 co-broke matches for Rajesh</div>
+              <div class="ps">His ₹1.8Cr Sarjapur villa brief matched network stock</div>
+            </div>
+            <button class="act-btn" onclick="go('s-network')">Swipe</button>
+          </div>
+          <div class="prow">
+            <div class="pico" style="background:var(--brand-soft);color:var(--brand)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 0 1 21 11.5z"/></svg></div>
+            <div class="pbody">
+              <div class="pt">Owner update link expiring</div>
+              <div class="ps">HSR 2BHK price unconfirmed for 9 days</div>
+            </div>
+            <button class="act-btn ghost" onclick="toast('Reminder sent to owner')">Nudge</button>
+          </div>
+        </div>
+
+        <!-- activity -->
+        <div class="section-h">Today's activity</div>
+        <div class="card" style="margin:0 18px">
+          <div class="prow"><div class="pico" style="background:var(--money-soft);color:var(--money)"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="pbody"><div class="pt" style="font-size:13.5px">Payment received — ₹1.1L</div><div class="ps">Prestige rental commission · 8:12 AM</div></div></div>
+          <div class="prow"><div class="pico" style="background:#E7F0FB;color:#2E72D2"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="pbody"><div class="pt" style="font-size:13.5px">New lead — Anita Reddy</div><div class="ps">99acres · 3BHK Hebbal · auto-imported</div></div><button class="act-btn ghost" onclick="go('s-leads')">View</button></div>
+        </div>
+      </section>
+
+      <!-- ================= CHATS (WHATSAPP) ================= -->
+      <section class="screen" id="s-chats">
+        <div class="topbar">
+          <div><div class="h-title">Chats</div><div class="h-sub">One inbox · owners, buyers, co-brokers</div></div>
+          <div class="iconbtn" onclick="toast('Search')"><svg width="19" height="19" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        </div>
+        <div class="scroller" style="margin-bottom:6px">
+          <div class="chip on">All</div><div class="chip hot">Hot leads</div><div class="chip">Owners</div><div class="chip">Co-brokers</div><div class="chip">Portal leads</div>
+        </div>
+        <div class="card" style="margin:6px 14px 0;padding:0;overflow:hidden">
+          <div class="wa-item" onclick="openThread('priya')">
+            <div class="wava" style="background:#E0473C"><svg width="22" height="22" viewBox="0 0 24 24" style="color:#fff"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+            <div class="wb"><div class="wn">Priya Menon <span class="tag" style="background:var(--hot-soft);color:var(--hot)">Hot lead</span></div><div class="wm">You: Sure, shall I book a visit Sat 11am?</div></div>
+            <div class="wmeta"><div class="wt">Fri</div><div class="unread">2</div></div>
+          </div>
+          <div class="wa-item" onclick="openThread('priya')">
+            <div class="wava" style="background:#2E72D2"><svg width="22" height="22" viewBox="0 0 24 24" style="color:#fff"><path d="M3 21h18M5 21V8l7-5 7 5v13"/></svg></div>
+            <div class="wb"><div class="wn">Mr. Krishnan (Owner) <span class="tag" style="background:var(--brand-soft);color:var(--brand)">Owner</span></div><div class="wm">Price is firm at 1.45, but negotiable for serious...</div></div>
+            <div class="wmeta"><div class="wt">9:02</div></div>
+          </div>
+          <div class="wa-item" onclick="openThread('priya')">
+            <div class="wava" style="background:#6F58F0"><svg width="22" height="22" viewBox="0 0 24 24" style="color:#fff"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0 .1M22 21v-2a4 4 0 0 0-3-3.8"/></svg></div>
+            <div class="wb"><div class="wn">Suresh (Co-broker) <span class="tag" style="background:var(--ai-soft);color:var(--ai)">Co-broker</span></div><div class="wm">My client loved your Whitefield unit. 50-50?</div></div>
+            <div class="wmeta"><div class="wt">8:47</div><div class="unread">1</div></div>
+          </div>
+          <div class="wa-item" onclick="openThread('priya')">
+            <div class="wava" style="background:var(--gold)"><span style="color:#fff;font-weight:700;font-size:11px">99a</span></div>
+            <div class="wb"><div class="wn">Anita Reddy <span class="tag" style="background:var(--gold-soft);color:var(--gold)">New · 99acres</span></div><div class="wm">AI parsed: 3BHK Hebbal, budget ₹1.2Cr, ready to...</div></div>
+            <div class="wmeta"><div class="wt">8:12</div><div class="unread">1</div></div>
+          </div>
+          <div class="wa-item" onclick="openThread('priya')">
+            <div class="wava" style="background:#1A7A4E"><svg width="22" height="22" viewBox="0 0 24 24" style="color:#fff"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+            <div class="wb"><div class="wn">Rajesh Iyer <span class="tag" style="background:var(--hot-soft);color:var(--hot)">Hot lead</span></div><div class="wm">Looking for villa in Sarjapur, ~1.8Cr budget</div></div>
+            <div class="wmeta"><div class="wt">Yest</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STOCK (PROPERTIES) ================= -->
+      <section class="screen" id="s-stock">
+        <div class="topbar">
+          <div><div class="h-title">My stock</div><div class="h-sub">34 active listings</div></div>
+          <div class="iconbtn" style="background:var(--brand);color:#fff;border-color:var(--brand)" onclick="toast('Add property')"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+        </div>
+        <div class="scroller" style="margin-bottom:4px">
+          <div class="chip on">All 34</div><div class="chip">Whitefield</div><div class="chip">HSR</div><div class="chip">Sarjapur</div><div class="chip">Hebbal</div><div class="chip money">Co-broked 8</div>
+        </div>
+        <div class="plist">
+          <div class="pcard" onclick="openCard()">
+            <div class="img" style="background-image:linear-gradient(120deg,#3a5a45,#6e8f78)">
+              <div class="badges"><span class="pbadge live">● Live</span><span class="pbadge cobroke">Co-broke</span></div>
+              <div class="cnt"><span>◎ 8</span><span>▶ 1</span></div>
+            </div>
+            <div class="body">
+              <div class="row between">
+                <div class="price tnum">₹1.45 Cr</div>
+                <span class="chip gold tiny">AI: priced right</span>
+              </div>
+              <div class="persq tnum">₹9,200/sqft · negotiable</div>
+              <div style="font-size:14px;font-weight:600;margin-top:7px">3BHK · Prestige Lakeside, Whitefield</div>
+              <div class="spec">
+                <div>◧ 1,575 sqft</div><div>⌂ 3 Bed</div><div>⊞ 2 Park</div><div>✦ E-facing</div>
+              </div>
+              <div class="pfoot">
+                <button class="act-btn ghost" onclick="event.stopPropagation();openCard()">Share card</button>
+                <button class="act-btn brand" onclick="event.stopPropagation();toast('Marketing kit generating…')">Market</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pcard" onclick="openCard()">
+            <div class="img" style="background-image:linear-gradient(120deg,#4a4f6a,#8a90b5)">
+              <div class="badges"><span class="pbadge live">● Live</span></div>
+              <div class="cnt"><span>◎ 12</span><span>▶ 1</span></div>
+            </div>
+            <div class="body">
+              <div class="row between"><div class="price tnum">₹2.10 Cr</div><span class="chip money tiny">9 enquiries</span></div>
+              <div class="persq tnum">₹11,400/sqft · fixed</div>
+              <div style="font-size:14px;font-weight:600;margin-top:7px">4BHK Penthouse · Sobha Dream, Sarjapur</div>
+              <div class="spec"><div>◧ 1,840 sqft</div><div>⌂ 4 Bed</div><div>⊞ 2 Park</div></div>
+              <div class="pfoot"><button class="act-btn ghost" onclick="event.stopPropagation();openCard()">Share card</button><button class="act-btn brand" onclick="event.stopPropagation();toast('Marketing kit generating…')">Market</button></div>
+            </div>
+          </div>
+
+          <div class="pcard" onclick="openCard()">
+            <div class="img" style="background-image:linear-gradient(120deg,#5a4a3a,#a8906e)">
+              <div class="badges"><span class="pbadge" style="background:var(--gold);color:#fff">Owner price?</span></div>
+              <div class="cnt"><span>◎ 5</span></div>
+            </div>
+            <div class="body">
+              <div class="row between"><div class="price tnum">₹78 L</div><span class="chip tiny">Needs update</span></div>
+              <div class="persq tnum">₹6,100/sqft</div>
+              <div style="font-size:14px;font-weight:600;margin-top:7px">2BHK · Purva Skydale, HSR Layout</div>
+              <div class="spec"><div>◧ 1,280 sqft</div><div>⌂ 2 Bed</div><div>⊞ 1 Park</div></div>
+              <div class="pfoot"><button class="act-btn ghost" onclick="event.stopPropagation();toast('Owner update link sent')">Update owner</button><button class="act-btn brand" onclick="event.stopPropagation();openCard()">Share</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= NETWORK (CO-BROKING) ================= -->
+      <section class="screen" id="s-network">
+        <div class="topbar">
+          <div><div class="h-title">Co-broking</div><div class="h-sub">Protected network · owner stays hidden</div></div>
+          <div class="oob"><svg width="13" height="13" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> OOB lock</div>
+        </div>
+        <div class="tabs">
+          <div class="tab on" onclick="cobrokeTab(this,'ai')">AI Matches</div>
+          <div class="tab" onclick="cobrokeTab(this,'incoming')">Incoming</div>
+          <div class="tab" onclick="cobrokeTab(this,'shared')">My Shared</div>
+          <div class="tab" onclick="cobrokeTab(this,'req')">Requirements</div>
+          <div class="tab" onclick="cobrokeTab(this,'explore')">Explore</div>
+        </div>
+
+        <!-- AI Matches deck -->
+        <div id="cb-ai">
+          <div style="font-size:12.5px;color:var(--ink-2);padding:0 18px 12px">Stock from other brokers that fits <b style="color:var(--ink)">your buyers</b>. Swipe right to request co-broke.</div>
+          <div class="deck" id="deck"></div>
+          <div class="swipe-actions">
+            <button class="sw-btn skip" onclick="swipe('skip')"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+            <button class="sw-btn save" onclick="swipe('save')"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+            <button class="sw-btn acc" onclick="swipe('acc')"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
+          </div>
+        </div>
+
+        <!-- Incoming -->
+        <div id="cb-incoming" style="display:none">
+          <div style="font-size:12.5px;color:var(--ink-2);padding:0 18px 12px">Brokers who want <b style="color:var(--ink)">your stock</b> for their buyers.</div>
+          <div class="card" style="margin:0 18px;padding:16px">
+            <div class="row between"><div class="bscore"><svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.5 4.5L18 21l-6-4-6 4 1.5-7L2 9.5 9 9z"/></svg> Score 88</div><span class="chip tiny">2h ago</span></div>
+            <div style="font-size:15px;font-weight:700;margin-top:10px">Deepak wants your Prestige Lakeside 3BHK</div>
+            <div style="font-size:12.5px;color:var(--ink-2);margin-top:4px">For a relocating IT family · budget matches · ready buyer</div>
+            <div class="splitbar"><div class="a" style="flex:1">You 55%</div><div class="b" style="flex:.82">Deepak 45%</div></div>
+            <div class="oob" style="margin-top:12px">🔒 Owner identity stays hidden the whole way</div>
+            <div class="pfoot"><button class="act-btn ghost" onclick="toast('Declined')">Decline</button><button class="act-btn brand" onclick="toast('Accepted — chat opened')">Accept co-broke</button></div>
+          </div>
+        </div>
+
+        <!-- Shared -->
+        <div id="cb-shared" style="display:none">
+          <div class="plist" style="padding-top:0">
+            <div class="card" style="padding:15px">
+              <div class="row between"><div style="font-size:14.5px;font-weight:700">Sobha Dream 4BHK</div><span class="oob">🔒 Owner hidden</span></div>
+              <div class="row gap12" style="margin-top:12px;font-size:12px;color:var(--ink-2)">
+                <div><b style="font-family:'Bricolage Grotesque';font-size:18px;color:var(--ink);display:block">142</b>Views</div>
+                <div><b style="font-family:'Bricolage Grotesque';font-size:18px;color:var(--ink);display:block">9</b>Enquiries</div>
+                <div><b style="font-family:'Bricolage Grotesque';font-size:18px;color:var(--ink);display:block">3</b>Brokers</div>
+              </div>
+              <div class="splitbar"><div class="a" style="flex:1">You 50%</div><div class="b" style="flex:1">Partner 50%</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Requirements -->
+        <div id="cb-req" style="display:none">
+          <div class="plist" style="padding-top:0">
+            <div class="card" style="padding:15px">
+              <div class="row between"><div style="font-size:14.5px;font-weight:700">Rajesh — Sarjapur villa</div><span class="chip hot tiny">Urgent</span></div>
+              <div style="font-size:12.5px;color:var(--ink-2);margin-top:6px">3-4BHK villa · ₹1.6–1.9Cr · gated · ready-to-move</div>
+              <div class="row gap8" style="margin-top:10px"><span class="chip tiny">Villa</span><span class="chip tiny">Gated</span><span class="chip money tiny">7 matches found</span></div>
+              <button class="act-btn brand" style="width:100%;margin-top:13px" onclick="cobrokeTab(document.querySelectorAll('.tab')[0],'ai')">See 7 matches</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explore (locked) -->
+        <div id="cb-explore" style="display:none">
+          <div class="locked">
+            <div class="lockring"><svg width="28" height="28" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div style="font-size:16px;font-weight:700">Marketplace unlocks at 200 brokers</div>
+            <div style="font-size:13px;color:var(--ink-2);margin-top:8px;line-height:1.5">An empty marketplace kills trust. Browse opens once Bangalore hits 200 verified brokers. You're broker <b style="color:var(--brand)">#187</b> — almost there.</div>
+            <div class="bar" style="margin:16px 0 6px"><i style="width:93%;background:var(--brand)"></i></div>
+            <div style="font-size:11px;color:var(--ink-2)">187 / 200 brokers onboarded</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= MONEY ================= -->
+      <section class="screen" id="s-money">
+        <div class="topbar"><div><div class="h-title">Money</div><div class="h-sub">Commission · invoices · GST</div></div>
+          <div class="iconbtn" onclick="toast('New invoice')"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div></div>
+        <div class="balance">
+          <div class="bl">Pending commission</div>
+          <div class="bn tnum">₹6,80,000</div>
+          <div class="brow">
+            <div>Earned (MTD)<b class="tnum">₹4.1L</b></div>
+            <div>Overdue<b class="tnum" style="color:#FFC9C2">₹2.4L</b></div>
+            <div>GST due<b class="tnum">₹73K</b></div>
+          </div>
+        </div>
+        <div class="brief" style="background:linear-gradient(135deg,#0E2A1C,#0B6B3A);box-shadow:0 12px 28px rgba(11,107,58,.3)">
+          <div class="eyebrow"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16z"/></svg> Finance brief</div>
+          <h3 style="font-size:15px">2 invoices are overdue 45+ days — legal notice ready to send</h3>
+          <p>The Sobha Dream deal closed but was never invoiced. Bill ₹2.4L now while it's fresh.</p>
+        </div>
+
+        <div class="section-h">Invoices <span style="font-size:13px;color:var(--ink-3)">3</span></div>
+        <div class="card" style="margin:0 18px;padding:0">
+          <div class="inv">
+            <div class="ih"><div><div class="iname">Sobha Dream — 4BHK</div><div class="sm muted" style="margin-top:2px">Rajesh Iyer · not yet billed</div></div><div class="iamt tnum" style="color:var(--hot)">₹2.4L</div></div>
+            <div class="track">
+              <div class="step cur"><div class="dot">1</div><div class="sl">Generate</div></div>
+              <div class="step"><div class="line"></div><div class="dot">2</div><div class="sl">Sent</div></div>
+              <div class="step"><div class="line"></div><div class="dot">3</div><div class="sl">Viewed</div></div>
+              <div class="step"><div class="line"></div><div class="dot">4</div><div class="sl">Paid</div></div>
+            </div>
+            <button class="act-btn brand" style="width:100%;margin-top:13px" onclick="toast('Invoice generated + Razorpay link created')">Generate invoice + payment link</button>
+          </div>
+          <div class="inv">
+            <div class="ih"><div><div class="iname">Prestige rental</div><div class="sm muted" style="margin-top:2px">Sent · viewed 2 days ago</div></div><div class="iamt tnum" style="color:var(--gold)">₹1.1L</div></div>
+            <div class="track">
+              <div class="step done"><div class="dot">✓</div><div class="sl">Generate</div></div>
+              <div class="step done"><div class="line"></div><div class="dot">✓</div><div class="sl">Sent</div></div>
+              <div class="step cur"><div class="line"></div><div class="dot">3</div><div class="sl">Viewed</div></div>
+              <div class="step"><div class="line"></div><div class="dot">4</div><div class="sl">Paid</div></div>
+            </div>
+            <div class="pfoot"><button class="act-btn ghost" onclick="toast('Reminder sent on WhatsApp')">Remind</button><button class="act-btn ghost" onclick="toast('Payment link copied')">Copy link</button></div>
+          </div>
+          <div class="inv">
+            <div class="ih"><div><div class="iname">Brigade plot — overdue</div><div class="sm muted" style="margin-top:2px;color:var(--hot)">52 days overdue</div></div><div class="iamt tnum" style="color:var(--money)">₹3.2L</div></div>
+            <div class="track">
+              <div class="step done"><div class="dot">✓</div><div class="sl">Generate</div></div>
+              <div class="step done"><div class="line"></div><div class="dot">✓</div><div class="sl">Sent</div></div>
+              <div class="step done"><div class="line"></div><div class="dot">✓</div><div class="sl">Viewed</div></div>
+              <div class="step"><div class="line"></div><div class="dot">4</div><div class="sl">Paid</div></div>
+            </div>
+            <button class="act-btn" style="width:100%;margin-top:13px;background:var(--hot)" onclick="toast('Legal notice drafted — review before sending')">Review legal notice</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STAMP DUTY ================= -->
+      <section class="screen" id="s-lawyer">
+        <div class="subhead"><div class="back" onclick="go('s-home')"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><h2>Stamp duty calculator</h2></div>
+        <div style="font-size:12.5px;color:var(--ink-2);padding:0 18px 4px">Free · Karnataka rates · part of InBuilt Lawyer</div>
+        <div class="calc">
+          <label class="field-l">Property value (₹)</label>
+          <input class="input tnum" id="pval" value="14500000" oninput="calcDuty()" inputmode="numeric">
+          <label class="field-l">Property type</label>
+          <div class="seg" id="ptype"><button class="on" onclick="seg(this,'ptype');calcDuty()">Apartment</button><button onclick="seg(this,'ptype');calcDuty()">Plot</button><button onclick="seg(this,'ptype');calcDuty()">Villa</button></div>
+          <label class="field-l">Buyer</label>
+          <div class="seg" id="gender"><button class="on" onclick="seg(this,'gender');calcDuty()">Male / Joint</button><button onclick="seg(this,'gender');calcDuty()">Female</button></div>
+          <div class="calc-out">
+            <div class="line"><span>Stamp duty <b id="sdrate">(5%)</b></span><b id="sd" class="tnum">₹7,25,000</b></div>
+            <div class="line"><span>Registration (1%)</span><b id="reg" class="tnum">₹1,45,000</b></div>
+            <div class="line"><span>Cess & surcharge</span><b id="cess" class="tnum">₹43,500</b></div>
+            <div class="total"><span class="t">Total payable</span><span class="v tnum" id="total">₹9,13,500</span></div>
+            <div class="save-pill" id="savepill" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> <span id="savetxt"></span></div>
+          </div>
+          <button class="act-btn brand" style="width:100%;margin-top:14px" onclick="toast('Saved to property · added to card')">Add to property card</button>
+        </div>
+        <div class="section-h">More from InBuilt Lawyer</div>
+        <div class="plist" style="padding-top:0">
+          <div class="card pad row between" style="padding:14px"><div><div class="pt">Rental agreement</div><div class="ps">Auto-filled · PDF · Aadhaar e-sign</div></div><span class="chip gold">50 tokens</span></div>
+          <div class="card pad row between" style="padding:14px"><div><div class="pt">Sale deed draft</div><div class="ps">AI-generated · review-ready</div></div><span class="chip gold">₹999</span></div>
+          <div class="card pad row between" style="padding:14px"><div><div class="pt">Document risk check</div><div class="ps">Traffic-light review of any deed</div></div><span class="chip gold">₹299</span></div>
+        </div>
+      </section>
+
+      <!-- ================= VISITS ================= -->
+      <section class="screen" id="s-visits">
+        <div class="subhead"><div class="back" onclick="go('s-home')"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><h2>Site visits</h2></div>
+        <div class="aiprice" style="margin:6px 18px;background:linear-gradient(135deg,#171033,#5B3BE0)">
+          <div class="h"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16z"/></svg> AI route · today</div>
+          <div class="verdict">38 min total driving</div>
+          <p style="font-size:12.5px;opacity:.9">Best order: Indiranagar → HSR → Whitefield. Saves you 1h 5m vs your original plan.</p>
+        </div>
+        <div class="plist" style="padding-top:8px">
+          <div class="card" style="padding:14px"><div class="row between"><div style="font-size:14px;font-weight:700">11:00 · Priya Menon</div><span class="chip hot tiny">Hot</span></div><div class="ps" style="margin-top:4px">Prestige Lakeside 3BHK · Whitefield</div><div class="pfoot"><button class="act-btn ghost" onclick="toast('Calling…')">Call</button><button class="act-btn brand" onclick="toast('Opening directions')">Directions</button></div></div>
+          <div class="card" style="padding:14px"><div class="row between"><div style="font-size:14px;font-weight:700">14:30 · Anita Reddy</div><span class="chip tiny">Warm</span></div><div class="ps" style="margin-top:4px">Hebbal 3BHK · 99acres lead</div><div class="pfoot"><button class="act-btn ghost" onclick="toast('Calling…')">Call</button><button class="act-btn brand" onclick="toast('Opening directions')">Directions</button></div></div>
+        </div>
+      </section>
+
+      <!-- ================= MARKETING ================= -->
+      <section class="screen" id="s-marketing">
+        <div class="subhead"><div class="back" onclick="go('s-home')"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><h2>Marketing studio</h2></div>
+        <div class="card" style="margin:6px 18px;padding:15px">
+          <div class="sm muted">Property</div>
+          <div style="font-size:15px;font-weight:700;margin-top:3px">Prestige Lakeside 3BHK · Whitefield</div>
+        </div>
+        <div class="section-h">AI content · 4 platforms</div>
+        <div class="plist" style="padding-top:0">
+          <div class="card pad row between" style="padding:14px"><div class="row gap12"><div class="pico" style="background:#FDE7F0;color:#D6336C"><svg width="18" height="18" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg></div><div><div class="pt">Instagram reel</div><div class="ps">Caption + hashtags + AI reel</div></div></div><button class="act-btn brand" onclick="toast('Generating reel…')">Make</button></div>
+          <div class="card pad row between" style="padding:14px"><div class="row gap12"><div class="pico" style="background:var(--money-soft);color:var(--wa)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.8 7.5L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg></div><div><div class="pt">WhatsApp broadcast</div><div class="ps">Ready-to-send to 247 contacts</div></div></div><button class="act-btn brand" onclick="toast('Draft ready')">Make</button></div>
+          <div class="card pad row between" style="padding:14px"><div class="row gap12"><div class="pico" style="background:#E7F0FB;color:#2E72D2"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v6h-4v-6a2 2 0 0 0-4 0v6h-4v-6a6 6 0 0 1 6-6zM6 9H2v11h4z"/><circle cx="4" cy="4" r="2"/></svg></div><div><div class="pt">LinkedIn post</div><div class="ps">Investor-grade copy</div></div></div><button class="act-btn brand" onclick="toast('Draft ready')">Make</button></div>
+        </div>
+        <div class="card" style="margin:14px 18px;padding:16px;background:linear-gradient(135deg,#0B6B3A,#06472A);color:#fff">
+          <div style="font-size:14px;font-weight:700">Boost as an ad</div>
+          <div style="font-size:12.5px;opacity:.85;margin-top:4px">₹2,000 budget → est. 18–24 qualified leads</div>
+          <button class="act-btn" style="width:100%;margin-top:13px;background:#fff;color:var(--brand-d)" onclick="toast('Campaign launched · 4% fee')">Launch campaign</button>
+        </div>
+      </section>
+
+      <!-- ================= LEADS ================= -->
+      <section class="screen" id="s-leads">
+        <div class="subhead"><div class="back" onclick="go('s-home')"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><h2>Leads</h2></div>
+        <div class="scroller" style="margin-bottom:4px"><div class="chip on">All</div><div class="chip hot">Hot 9</div><div class="chip">Warm</div><div class="chip">MagicBricks</div><div class="chip">WhatsApp</div></div>
+        <div class="card" style="margin:6px 14px 0;padding:0">
+          <div class="lead" onclick="openThread('priya')">
+            <div class="lava" style="background:#E0473C">PM</div>
+            <div style="flex:1"><div style="font-size:14.5px;font-weight:600">Priya Menon</div><div class="ps">3BHK Whitefield · ₹1.4Cr · viewed card 4×</div><div class="bar"><i style="width:88%;background:var(--hot)"></i></div></div>
+            <div class="score"><div class="sn" style="color:var(--hot)">88</div><div class="sl">Intent</div></div>
+          </div>
+          <div class="lead" onclick="openThread('priya')">
+            <div class="lava" style="background:var(--gold)">AR</div>
+            <div style="flex:1"><div style="font-size:14.5px;font-weight:600">Anita Reddy</div><div class="ps">3BHK Hebbal · ₹1.2Cr · 99acres</div><div class="bar"><i style="width:72%;background:var(--gold)"></i></div></div>
+            <div class="score"><div class="sn" style="color:var(--gold)">72</div><div class="sl">Intent</div></div>
+          </div>
+          <div class="lead" onclick="openThread('priya')">
+            <div class="lava" style="background:#1A7A4E">RI</div>
+            <div style="flex:1"><div style="font-size:14.5px;font-weight:600">Rajesh Iyer</div><div class="ps">Villa Sarjapur · ₹1.8Cr · 7 co-broke matches</div><div class="bar"><i style="width:81%;background:var(--money)"></i></div></div>
+            <div class="score"><div class="sn" style="color:var(--money)">81</div><div class="sl">Intent</div></div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /screens -->
+
+    <!-- AI FAB -->
+    <button class="fab" onclick="openAI()"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/><path d="M19 14l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></button>
+
+    <!-- bottom nav -->
+    <nav class="nav">
+      <div class="ni on" data-s="s-home" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>Home</div>
+      <div class="ni" data-s="s-chats" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.8 7.5L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg>Chats</div>
+      <div class="ni" data-s="s-stock" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>Stock</div>
+      <div class="ni" data-s="s-network" onclick="nav(this)"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M9 6h6M8 8l8 8"/></svg>Network</div>
+      <div class="ni" data-s="s-money" onclick="nav(this)"><svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Money</div>
+    </nav>
+
+    <!-- AI sheet -->
+    <div class="sheet-wrap" id="aisheet">
+      <div class="scrim" onclick="closeAI()"></div>
+      <div class="sheet">
+        <div class="sheet-grab"></div>
+        <div class="sheet-head"><div class="ab"><svg width="20" height="20" viewBox="0 0 24 24" style="color:#fff"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></div><div><div style="font-size:15px;font-weight:700">Brokly AI</div><div class="sm muted">Knows your stock, leads & money</div></div></div>
+        <div class="sheet-body" id="aibody">
+          <div class="ai-msg"><div class="ab2"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16z"/></svg></div><div class="ac">Morning Ammar 👋 You've got 3 hot leads to re-engage and ₹2.4L to bill. Want me to plan your day?</div></div>
+        </div>
+        <div class="qchips">
+          <button class="qchip" onclick="aiAsk('plan')">📅 Plan my day</button>
+          <button class="qchip" onclick="aiAsk('roi')">📈 ROI on Sobha Dream</button>
+          <button class="qchip" onclick="aiAsk('draft')">✍️ Draft follow-up for Priya</button>
+          <button class="qchip" onclick="aiAsk('stamp')">🧾 Stamp duty ₹1.45Cr</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROPERTY CARD overlay -->
+    <div class="pc-overlay" id="pcard">
+      <div class="pc-hero" id="pchero" style="background-image:linear-gradient(120deg,#3a5a45,#6e8f78)">
+        <div class="pc-close" onclick="closeCard()"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="pc-share" onclick="toast('Link copied · brokly.app/p/wf3bhk')"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg> Share</div>
+        <div class="pc-label" id="pclabel"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13"/></svg> Living Room · 320 sqft</div>
+      </div>
+      <div class="pc-thumbs" id="pcthumbs"></div>
+
+      <div class="pc-sec">
+        <div class="row between">
+          <div><div class="price tnum" style="font-size:24px">₹1.45 Cr</div><div class="persq tnum">₹9,200/sqft · negotiable</div></div>
+          <span class="chip gold">✨ AI: priced right</span>
+        </div>
+        <div style="font-size:16px;font-weight:700;margin-top:8px">3BHK · Prestige Lakeside</div>
+        <div class="sm muted">Whitefield, Bengaluru 560066</div>
+        <div class="pc-grid">
+          <div class="g"><div class="gv tnum">3</div><div class="gl">Bedrooms</div></div>
+          <div class="g"><div class="gv tnum">1,575</div><div class="gl">Sq ft</div></div>
+          <div class="g"><div class="gv tnum">2</div><div class="gl">Car parks</div></div>
+          <div class="g"><div class="gv tnum">3</div><div class="gl">Bathrooms</div></div>
+        </div>
+      </div>
+
+      <div class="pc-sec">
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px">Property details</div>
+        <div class="dl"><span>Facing</span><b>East</b></div>
+        <div class="dl"><span>Floor</span><b>12 of 18</b></div>
+        <div class="dl"><span>Age</span><b>2 years</b></div>
+        <div class="dl"><span>Furnishing</span><b>Semi-furnished</b></div>
+        <div class="dl"><span>Possession</span><b>Ready to move</b></div>
+      </div>
+
+      <div class="pc-sec">
+        <div style="font-size:14px;font-weight:700">Amenities</div>
+        <div class="amen"><span>🏊 Pool</span><span>🏋️ Gym</span><span>🌳 Park</span><span>🛗 2 Lifts</span><span>🔒 24/7 security</span><span>⚡ Power backup</span><span>🎯 Clubhouse</span></div>
+      </div>
+
+      <div class="pc-sec" style="padding:0;border:0;background:transparent;box-shadow:none">
+        <div class="aiprice">
+          <div class="h"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16z"/></svg> AI price check</div>
+          <div class="verdict">Fairly priced for the area</div>
+          <p style="font-size:12.5px;opacity:.9">Similar 3BHKs in Prestige Lakeside sold ₹8,900–9,600/sqft in the last 90 days. This is mid-band.</p>
+        </div>
+      </div>
+
+      <div class="pc-sec">
+        <div style="font-size:14px;font-weight:700">Stamp duty estimate</div>
+        <div class="dl" style="margin-top:6px"><span>Stamp duty (5%)</span><b class="tnum">₹7,25,000</b></div>
+        <div class="dl"><span>Registration + cess</span><b class="tnum">₹1,88,500</b></div>
+        <div class="dl"><span>Total</span><b class="tnum" style="color:var(--brand)">₹9,13,500</b></div>
+        <div class="save-pill" style="display:flex;margin-top:10px"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Female buyer saves ₹14,500 (1% rebate)</div>
+      </div>
+
+      <div class="pc-sec">
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px">Location</div>
+        <div class="loc-row"><div class="lc"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M4 11h16M6 11V7h12v4M8 19v2M16 19v2"/></svg></div><div><div class="ld">Whitefield Metro</div><div class="lt">Purple line</div></div><div class="lkm">1.2 km</div></div>
+        <div class="loc-row"><div class="lc"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg></div><div><div class="ld">Manipal Hospital</div><div class="lt">Multi-speciality</div></div><div class="lkm">2.0 km</div></div>
+        <div class="loc-row"><div class="lc"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M22 10L12 4 2 10l10 6 10-6zM6 12v5c3 2 9 2 12 0v-5"/></svg></div><div><div class="ld">Inventure Academy</div><div class="lt">ICSE school</div></div><div class="lkm">3.4 km</div></div>
+      </div>
+
+      <div class="broker-cta">
+        <div class="brow">
+          <div class="bav">AK</div>
+          <div style="flex:1"><div class="bn">Ammar Khan</div><div class="bb"><svg width="11" height="11" viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.5 4.5L18 21l-6-4-6 4 1.5-7L2 9.5 9 9z"/></svg> Brokly Score 92</div></div>
+        </div>
+        <div class="row gap12" style="margin-top:12px;font-size:11px;opacity:.85">
+          <div><b style="font-size:14px;display:block">8 yrs</b>Experience</div>
+          <div><b style="font-size:14px;display:block">140+</b>Deals closed</div>
+          <div><b style="font-size:14px;display:block">~6 min</b>Avg reply</div>
+        </div>
+        <div class="bbtns">
+          <button class="wa" onclick="toast('Opening WhatsApp…')"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.8 7.5L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg> WhatsApp</button>
+          <button class="call" onclick="toast('Calling…')"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg> Call</button>
+          <button class="visit" onclick="toast('Visit request sent')">Visit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- thread overlay (reuse pc-overlay style) -->
+    <div class="pc-overlay" id="thread">
+      <div style="background:var(--wa);padding:10px 14px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:5">
+        <div class="pc-close" style="position:static;background:rgba(255,255,255,.2)" onclick="closeThread()"><svg width="20" height="20" viewBox="0 0 24 24" style="color:#fff"><path d="M15 18l-6-6 6-6"/></svg></div>
+        <div class="wava" style="width:40px;height:40px;background:#E0473C"><svg width="20" height="20" viewBox="0 0 24 24" style="color:#fff"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+        <div style="color:#fff;flex:1"><div style="font-size:15px;font-weight:700">Priya Menon</div><div style="font-size:11px;opacity:.85">Buyer · intent 88 · online</div></div>
+        <div class="tag" style="background:rgba(255,255,255,.2);color:#fff">Hot lead</div>
+      </div>
+      <div class="thread">
+        <div class="bubbles">
+          <div class="bub them">Hi, is the Whitefield 3BHK still available?<div class="bt">Fri 4:02 PM</div></div>
+          <div class="bub me">Yes Priya! Prestige Lakeside, ₹1.45 Cr, east-facing. Sharing the full card 👇<div class="bt">Fri 4:05 PM ✓✓</div></div>
+          <div class="bub me" style="padding:0;overflow:hidden;background:#fff">
+            <div style="height:90px;background:linear-gradient(120deg,#3a5a45,#6e8f78)"></div>
+            <div style="padding:9px 11px"><b style="font-size:13px">3BHK · Prestige Lakeside</b><div style="font-size:11px;color:var(--ink-2)">brokly.app/p/wf3bhk</div></div>
+          </div>
+          <div class="bub them">Looks lovely. What's the per sqft?<div class="bt">Fri 4:20 PM</div></div>
+          <div class="bub me">₹9,200/sqft, slightly negotiable for a serious buyer 🙂<div class="bt">Fri 4:22 PM ✓✓</div></div>
+        </div>
+        <div class="ai-suggest">
+          <div class="h"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16z"/></svg> Suggested reply · she's gone quiet 3 days</div>
+          <div class="txt" id="aireply">Hi Priya 🙂 The Whitefield 3BHK is getting a lot of interest this week. Would Saturday 11 AM work for a quick site visit? I'll keep the slot for you.</div>
+          <div class="pfoot"><button class="act-btn ghost" onclick="toast('Reply regenerated')">Regenerate</button><button class="act-btn wa" onclick="sendReply()">Use & send</button></div>
+        </div>
+        <div class="wa-input"><div class="field" id="wafield">Message…</div><button class="wa-send" onclick="toast('Sent ✓')"><svg width="20" height="20" viewBox="0 0 24 24" style="color:#fff"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- nav ---------- */
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelector('.screens').scrollTop=0;
+  document.getElementById(id).scrollTop=0;
+  // sync bottom nav
+  document.querySelectorAll('.nav .ni').forEach(n=>n.classList.toggle('on',n.dataset.s===id));
+}
+function nav(el){go(el.dataset.s);}
+
+/* ---------- toast ---------- */
+let tt;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1900);}
+
+/* ---------- brief carousel ---------- */
+const briefs=[
+  {h:"3 hot leads went cold overnight — and ₹2.4L is sitting unbilled",p:"Priya Menon viewed your Whitefield 3BHK card 4 times but hasn't replied since Friday. Re-engage her first. Your Sobha deal closed 12 days ago and the invoice still isn't sent."},
+  {h:"Your Saturday is packed — AI optimised the route to save 65 minutes",p:"3 visits across Indiranagar, HSR and Whitefield. Reordering them saves you over an hour of driving. Tap Site visits to see the plan."},
+  {h:"7 co-broke matches found for Rajesh's ₹1.8Cr villa brief",p:"Network stock matched his Sarjapur requirement overnight. Two have Brokly Scores above 85. Swipe through them in Co-broking."}
+];
+let bi=0;
+function brief(d){bi=(bi+d+briefs.length)%briefs.length;document.getElementById('brief-h').textContent=briefs[bi].h;document.getElementById('brief-p').textContent=briefs[bi].p;document.querySelectorAll('.brief-dots i').forEach((x,i)=>x.classList.toggle('on',i===bi));}
+
+/* ---------- co-broking tabs ---------- */
+function cobrokeTab(el,name){
+  document.querySelectorAll('#s-network .tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  ['ai','incoming','shared','req','explore'].forEach(n=>{document.getElementById('cb-'+n).style.display=(n===name?'block':'none');});
+}
+
+/* ---------- swipe deck ---------- */
+const matches=[
+  {who:"For Rajesh Iyer",why:"3BHK villa in Sarjapur, gated, ₹1.78Cr — inside his budget and ready-to-move, exactly his brief.",title:"Adarsh Palm Retreat — 3BHK Villa",loc:"Sarjapur Road",broker:"Suresh K.",score:"86",split:"50 / 50",img:"linear-gradient(120deg,#4a5a3a,#8a9b6e)"},
+  {who:"For Rajesh Iyer",why:"Gated villa community, ₹1.65Cr, matches budget. Broker has fast response time and clean track record.",title:"Sobha Lifestyle — 4BHK Villa",loc:"Sarjapur",broker:"Meena R.",score:"91",split:"55 / 45",img:"linear-gradient(120deg,#3a4a5a,#6e7e9b)"},
+  {who:"For Anita Reddy",why:"3BHK in Hebbal at ₹1.18Cr, north-facing, near her preferred school cluster.",title:"Brigade Northridge — 3BHK",loc:"Hebbal",broker:"Vivek N.",score:"79",split:"50 / 50",img:"linear-gradient(120deg,#5a4a4a,#9b7e7e)"}
+];
+let mi=0;
+function renderDeck(){
+  const deck=document.getElementById('deck');deck.innerHTML='';
+  for(let k=Math.min(mi+1,matches.length-1);k>=mi;k--){
+    const m=matches[k];if(!m)continue;
+    const z=matches.length-k;
+    const card=document.createElement('div');card.className='swipecard';card.style.zIndex=z;
+    if(k>mi){card.style.transform='scale(.95) translateY(14px)';card.style.opacity='.6';}
+    card.innerHTML=`
+      <div class="top" style="background-image:${m.img}">
+        <div class="matchwhy"><div class="mh"><svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16z"/></svg> ${m.who}</div><p>${m.why}</p></div>
+      </div>
+      <div class="swipebody">
+        <div style="font-size:16px;font-weight:700">${m.title}</div>
+        <div class="sm muted">${m.loc} · owner hidden 🔒</div>
+        <div class="brokerline"><div class="avatar" style="width:34px;height:34px;font-size:13px">${m.broker.split(' ').map(x=>x[0]).join('')}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${m.broker}</div><div class="tiny muted">Listing broker</div></div><div class="bscore"><svg width="11" height="11" viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.5 4.5L18 21l-6-4-6 4 1.5-7L2 9.5 9 9z"/></svg> ${m.score}</div></div>
+        <div style="font-size:11px;color:var(--ink-2);margin-top:14px;font-weight:600">Commission split</div>
+        <div class="splitbar"><div class="a" style="flex:1">You ${m.split.split('/')[0]}%</div><div class="b" style="flex:1">Them ${m.split.split('/')[1]}%</div></div>
+      </div>`;
+    deck.appendChild(card);
+  }
+  if(mi>=matches.length){deck.innerHTML='<div class="locked" style="margin:0;border-style:solid"><div class="lockring" style="background:var(--money-soft);color:var(--money)"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div style="font-size:16px;font-weight:700">All caught up</div><div class="sm muted" style="margin-top:6px">New matches arrive as brokers add stock.</div></div>';}
+}
+function swipe(action){
+  const top=document.querySelector('#deck .swipecard');
+  if(!top||mi>=matches.length){return;}
+  if(action==='acc'){top.style.transform='translateX(120%) rotate(12deg)';toast('Co-broke requested ✓');}
+  else if(action==='skip'){top.style.transform='translateX(-120%) rotate(-12deg)';toast('Skipped');}
+  else{top.style.transform='translateY(-120%)';toast('Saved ★');}
+  top.style.opacity='0';
+  setTimeout(()=>{mi++;renderDeck();},340);
+}
+
+/* ---------- stamp duty ---------- */
+function seg(btn,group){document.querySelectorAll('#'+group+' button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+function inr(n){return '₹'+Math.round(n).toLocaleString('en-IN');}
+function calcDuty(){
+  const v=parseFloat(document.getElementById('pval').value)||0;
+  const female=document.querySelectorAll('#gender button')[1].classList.contains('on');
+  // Karnataka: >45L = 5% (female slight rebate modeled on cess), reg 1%, cess+surcharge ~3% of duty
+  let rate=v<2000000?2:(v<4500000?3:5);
+  const duty=v*rate/100;
+  const reg=v*0.01;
+  const cess=duty*0.10;
+  let total=duty+reg+cess;
+  let saving=0;
+  if(female){saving=duty*0.01;}/* illustrative female rebate */
+  document.getElementById('sdrate').textContent='('+rate+'%)';
+  document.getElementById('sd').textContent=inr(duty-saving);
+  document.getElementById('reg').textContent=inr(reg);
+  document.getElementById('cess').textContent=inr(cess);
+  document.getElementById('total').textContent=inr(total-saving);
+  const sp=document.getElementById('savepill');
+  if(female&&saving>0){sp.style.display='flex';document.getElementById('savetxt').textContent='Female buyer saves '+inr(saving);}
+  else{sp.style.display='none';}
+}
+
+/* ---------- AI sheet ---------- */
+function openAI(){document.getElementById('aisheet').classList.add('open');}
+function closeAI(){document.getElementById('aisheet').classList.remove('open');}
+const aiReplies={
+  plan:`<b>Your day, optimised:</b><div class="plan-card"><div class="pt2">9:30</div><div>Re-engage Priya (intent 88) — I drafted the message.</div></div><div class="plan-card"><div class="pt2">11:00</div><div>Site visit · Whitefield 3BHK with Priya.</div></div><div class="plan-card"><div class="pt2">13:00</div><div>Generate the ₹2.4L Sobha invoice — 2 mins.</div></div><div class="plan-card"><div class="pt2">14:30</div><div>Visit · Hebbal 3BHK with Anita.</div></div><div style="margin-top:10px;font-weight:600;color:var(--brand)">Revenue potential today: ₹3.5L</div>`,
+  roi:`<b>Sobha Dream 4BHK · ₹2.10 Cr</b><br>Est. rental ₹65,000/mo → <b>3.7% gross yield</b>.<br>Area appreciation ~9%/yr.<br><b>5-year projection:</b> ~₹3.2 Cr value + ₹39L rent = strong hold. Good investor pitch.`,
+  draft:`Here's a warm follow-up for Priya:<div class="ac" style="margin-top:8px;background:#fff;border:1px solid var(--line)">Hi Priya 🙂 The Whitefield 3BHK is getting a lot of interest this week. Would Saturday 11 AM work for a quick visit? Happy to hold the slot for you.</div><div style="margin-top:8px"><button class="act-btn wa" onclick="toast('Opening WhatsApp…')">Send via WhatsApp</button></div>`,
+  stamp:`<b>Stamp duty · ₹1.45 Cr (Karnataka)</b><br>Stamp duty (5%): ₹7,25,000<br>Registration (1%): ₹1,45,000<br>Cess: ₹43,500<br><b>Total: ₹9,13,500</b><br><span style="color:var(--money)">Female buyer saves ₹14,500.</span>`
+};
+function aiAsk(key){
+  const q={plan:'Plan my day',roi:'ROI on Sobha Dream',draft:'Draft follow-up for Priya',stamp:'Stamp duty for ₹1.45Cr'}[key];
+  const body=document.getElementById('aibody');
+  body.insertAdjacentHTML('beforeend',`<div class="ai-msg user"><div class="ac">${q}</div></div>`);
+  setTimeout(()=>{body.insertAdjacentHTML('beforeend',`<div class="ai-msg"><div class="ab2"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16z"/></svg></div><div class="ac">${aiReplies[key]}</div></div>`);body.scrollTop=body.scrollHeight;},260);
+  body.scrollTop=body.scrollHeight;
+}
+
+/* ---------- property card ---------- */
+const photos=[
+  {l:'Living Room · 320 sqft',img:'linear-gradient(120deg,#3a5a45,#6e8f78)'},
+  {l:'Master Bedroom · 180 sqft',img:'linear-gradient(120deg,#4a4a5a,#7e7e9b)'},
+  {l:'Modular Kitchen',img:'linear-gradient(120deg,#5a4a3a,#9b836e)'},
+  {l:'Balcony · Lake view',img:'linear-gradient(120deg,#3a5a5a,#6e9b9b)'},
+  {l:'Bathroom',img:'linear-gradient(120deg,#4a4a4a,#8a8a8a)'}
+];
+function buildThumbs(){
+  const t=document.getElementById('pcthumbs');t.innerHTML='';
+  photos.forEach((p,i)=>{
+    const d=document.createElement('div');d.className='th'+(i===0?' on':'');d.style.backgroundImage=p.img;
+    d.innerHTML=`<span>${p.l.split('·')[0]}</span>`;
+    d.onclick=()=>{document.getElementById('pchero').style.backgroundImage=p.img;document.getElementById('pclabel').innerHTML='<svg width="14" height="14" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13"/></svg> '+p.l;document.querySelectorAll('#pcthumbs .th').forEach(x=>x.classList.remove('on'));d.classList.add('on');};
+    t.appendChild(d);
+  });
+}
+function openCard(){document.getElementById('pcard').classList.add('open');document.getElementById('pcard').scrollTop=0;}
+function closeCard(){document.getElementById('pcard').classList.remove('open');}
+
+/* ---------- thread ---------- */
+function openThread(){document.getElementById('thread').classList.add('open');document.getElementById('thread').scrollTop=9999;}
+function closeThread(){document.getElementById('thread').classList.remove('open');}
+function sendReply(){document.getElementById('wafield').textContent=document.getElementById('aireply').textContent;document.getElementById('wafield').style.color='var(--ink)';toast('Reply ready — tap send');}
+
+/* init */
+renderDeck();buildThumbs();calcDuty();
+</script>
+</body>
+</html>

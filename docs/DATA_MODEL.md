@@ -1,7 +1,9 @@
 # Data model
 
-> Starting assumption — adjust to the real product. All monetary and quantity fields use integer
-> **minor units** (e.g. cents) with an explicit scale. Never store money as a float.
+> ⚠️ **Superseded.** This is the early **stock-brokerage** data model (accounts, orders, fills) —
+> not the real product. Brokly is a **real-estate CRM**; the live domain types are in
+> `src/lib/types.ts`. The money rule still holds: all amounts are integer **paise**
+> (`src/lib/money.ts`), never floats.
 
 ```mermaid
 erDiagram

@@ -1,0 +1,67 @@
+flowchart TD
+    U(["Buyer / lead"]):::src
+    CH["Lead channels<br/>MagicBricks · 99acres · Instagram<br/>WhatsApp · Facebook · Direct call"]:::src
+    NOTIF["Email + SMS notification to broker"]:::src
+
+    U --> CH
+    CH --> NOTIF
+
+    subgraph P2["② AI intake &amp; matching"]
+        BRK["Brokly<br/>Unified WhatsApp inbox"]:::intake
+        BOT["WhatsApp bot collects requirement<br/>budget · area · config · timeline"]:::intake
+        AIM["Brokly AI matches stock to requirement<br/>ranked &amp; scored"]:::intake
+        GEN["Smart link generated<br/>auto-updating collection"]:::intake
+        SENT["Property link sent to buyer on WhatsApp"]:::intake
+        BRK --> BOT --> AIM --> GEN --> SENT
+    end
+
+    NOTIF --> BRK
+    CH -->|"inbound message / call"| BRK
+
+    subgraph P3["③ Buyer link experience"]
+        VIEW["Buyer opens link<br/>browses matched properties"]:::buyer
+        ACT{"Action on the link?"}:::dec
+        QA["Asks questions on a property"]:::buyer
+        VIEW --> ACT
+        ACT -->|"question"| QA --> VIEW
+    end
+
+    SENT --> VIEW
+    VIEW -.->|"enquiry"| LEADS["Leads dashboard<br/>AI-scored, tied to property"]:::buyer
+
+    subgraph P4["④ Liked → visit → close"]
+        VISIT["Schedule site visit"]:::deal
+        VOK{"Visit went well?"}:::dec
+        XFER["Proceed to booking / transfer"]:::deal
+        COMM["Commission calculated<br/>rate · co-broke split · 18% GST"]:::deal
+        INV["GST invoice + Razorpay link<br/>payment tracked"]:::deal
+        LAW["InBuilt Lawyer<br/>stamp duty + deed generated"]:::deal
+        CLOSE(["Deal closed<br/>Brokly Score updated"]):::deal
+        VISIT --> VOK
+        VOK -->|"yes"| XFER --> COMM --> INV --> LAW --> CLOSE
+    end
+
+    ACT -->|"likes a property"| VISIT
+    VOK -->|"no, keep looking"| VIEW
+
+    subgraph P5["⑤ Rejected → co-broking loop"]
+        POST["Requirement posted to<br/>Co-broking marketplace"]:::cb
+        CBAI["AI matches co-broke inventory<br/>owner OOB-locked · commission protected"]:::cb
+        UPD["Same link auto-updated<br/>with new matching properties"]:::cb
+        POST --> CBAI --> UPD
+    end
+
+    ACT -->|"rejects all"| POST
+    UPD -->|"buyer re-opens same link"| VIEW
+
+    classDef src fill:#E7F0FB,stroke:#2E72D2,stroke-width:1.5px,color:#0E1F18
+    classDef intake fill:#ECE8FE,stroke:#6F58F0,stroke-width:1.5px,color:#0E1F18
+    classDef buyer fill:#E4F2EA,stroke:#0B6B3A,stroke-width:1.5px,color:#0E1F18
+    classDef deal fill:#E1F4EB,stroke:#12925A,stroke-width:1.5px,color:#0E1F18
+    classDef cb fill:#FBF0DA,stroke:#C98A15,stroke-width:1.5px,color:#0E1F18
+    classDef dec fill:#FCE7E5,stroke:#E0473C,stroke-width:1.5px,color:#0E1F18
+
+    style P2 fill:#F7F5FF,stroke:#DAD2FB,color:#6F58F0
+    style P3 fill:#F1F8F4,stroke:#CFE7DA,color:#0B6B3A
+    style P4 fill:#EFFAF4,stroke:#CDEBDD,color:#12925A
+    style P5 fill:#FCF7EA,stroke:#EAD9AE,color:#C98A15

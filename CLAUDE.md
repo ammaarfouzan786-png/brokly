@@ -2,37 +2,44 @@
 
 Guidance for Claude Code (and other AI agents) working in this repository. Read this first.
 
-> **Assumption to verify:** This scaffold treats **Brokly** as an online brokerage / trading
-> platform built as a full-stack TypeScript application. The empty repo had no product spec, so
-> this was inferred from the name. If Brokly is something else, update this file and
-> `docs/ARCHITECTURE.md` — everything else keys off them.
+> **Product (confirmed):** **Brokly** is a **real-estate brokerage CRM for Indian property
+> brokers**, with WhatsApp at its core. It was built from the HTML prototypes in the repo root
+> (`Brokly_*.html`) and `Brokly_flow.mermaid`. The earlier "stock brokerage / trading platform"
+> guess (still reflected in `docs/ARCHITECTURE.md` and `docs/DATA_MODEL.md`) was **wrong** — treat
+> this file, `README.md`, and the code under `src/` as current.
 
 ## What Brokly is
 
-Brokly is a web-based brokerage platform. Users open and verify an account (KYC), fund it,
-browse tradable assets with live market data, place and manage orders, and track a portfolio and
-statements. A server-side execution layer talks to external market-data and liquidity providers,
-a payment processor, and a KYC/compliance provider.
+Brokly runs a property broker's whole day from one app (web + installable PWA). Core domains
+(each is a screen under `src/components/screens/`):
 
-Core domains:
+- **Inbox** — unified WhatsApp inbox with context-aware AI-suggested replies (official Cloud API).
+- **Stock** — the broker's property inventory.
+- **Clients & matching** — capture a buyer brief, rank stock with a scored match (`src/lib/matching.ts`).
+- **Links** — single + auto-updating "smart collection" share links; public buyer view at `/l/...`.
+- **Leads** — enquiries returned AI-scored (HOT/WARM/COLD), tied to the property.
+- **Co-broke** — other brokers' inventory, owner kept out-of-band (OOB), commission protected.
+- **Money** — commission (co-broke split + 18% GST) → GST invoice + payment link (`src/lib/commission.ts`).
+- **Lawyer** — Karnataka stamp-duty/registration calc + rental/sale deed drafts (`src/lib/stampduty.ts`).
+- **Brand** — logo generator with SVG export. Plus a floating **AI assistant** over live data.
 
-- **Accounts & Auth** — sign-up, login, sessions, account lifecycle.
-- **KYC / Compliance** — identity verification, sanctions/PEP screening, audit trail.
-- **Funding & Payments** — deposits, withdrawals, ledger, reconciliation.
-- **Market Data** — quotes, order books, historical bars (streamed to clients).
-- **Orders & Execution** — order capture, validation, routing, fills, lifecycle.
-- **Portfolio & Reporting** — positions, P&L, balances, statements.
-- **Notifications** — email/push/in-app for fills, funding, and account events.
+Region assumptions: India / Bengaluru / ₹ INR / Karnataka. All money is integer **paise**.
 
-## Tech stack (default)
+## Tech stack (as built)
 
-- **Frontend:** Next.js (React, TypeScript), Tailwind CSS.
-- **Backend:** Node.js + TypeScript, modular services behind an API/BFF layer.
-- **Data:** PostgreSQL (via Prisma), Redis for cache + queues, a message bus for events.
-- **Realtime:** WebSockets for live quotes and order updates.
-- **Infra:** Docker for local dev; CI runs lint + typecheck + tests.
+- **Framework:** Next.js 15 (App Router) + React 19 + TypeScript (strict).
+- **Styling:** hand-built CSS design system in `src/app/globals.css` (ported from the prototypes).
+  Tailwind is **not** used despite the original guess.
+- **State:** Zustand (`src/lib/store.ts`), persisted to `localStorage`.
+- **WhatsApp:** official Meta **Cloud API** — `src/lib/whatsapp.ts` + `src/app/api/whatsapp/*`
+  (webhook verify/receive, send, poll, status). Simulates when unconfigured; see `WHATSAPP_SETUP.md`.
+- **Share links + enquiries:** `/l/[...slug]` + `/api/links` + `/api/enquiry`, backed by
+  process-local in-memory stores (`src/lib/link-store.ts`, `src/lib/server-store.ts`).
+- **Mobile:** installable PWA (`public/manifest.webmanifest`, `public/sw.js`).
 
-See `docs/ARCHITECTURE.md` for the component map and `docs/DATA_MODEL.md` for the schema.
+> The Postgres/Prisma/Redis/WebSocket stack from the old guess is **not** used — state is
+> client-side + in-memory so the app runs with zero external services. Adding a real DB for
+> persistence + a real auth provider are the natural next steps.
 
 ## Repository layout
 
@@ -44,13 +51,18 @@ Brokly/
 ├── .claude/            # Claude Code config + custom slash commands
 │   ├── settings.json
 │   └── commands/
-├── docs/               # Architecture, data model, API, setup, handoff
-│   └── diagrams/       # Mermaid source (.mermaid) for all diagrams
-└── src/ (to be added)  # Application code once the stack is initialized
+├── docs/               # ⚠ old stock-brokerage guess — superseded by code + README
+│   └── diagrams/       # Mermaid source (.mermaid)
+├── public/             # PWA manifest, service worker, icons
+├── Brokly_*.html       # Product prototypes the app was built from
+└── src/
+    ├── app/            # App Router: page, layout, /l/[...slug], /api/* (whatsapp, links, enquiry)
+    ├── components/     # UI: screens/, Shell, Modal, BuyerOverlay, Assistant, Auth…
+    └── lib/            # Domain: store, money, matching, stampduty, commission, whatsapp, seed
 ```
 
-Application source does not exist yet — this is a documentation-and-config scaffold. When you
-initialize the app, follow the structure described in `docs/ARCHITECTURE.md`.
+The app is implemented under `src/` (Next.js App Router). The money/matching/commission/stamp-duty
+logic in `src/lib/` are pure functions — easy to unit-test.
 
 ## Conventions
 
@@ -66,26 +78,17 @@ initialize the app, follow the structure described in `docs/ARCHITECTURE.md`.
 
 ## Common commands
 
-These are placeholders until the app is scaffolded — update the scripts as you add them.
-
 ```bash
-# install deps
-npm install
-
-# run the dev server
-npm run dev
-
-# typecheck + lint
-npm run typecheck
-npm run lint
-
-# tests
-npm test
-
-# database (Prisma)
-npm run db:migrate
-npm run db:seed
+npm install          # install deps
+npm run dev          # dev server → http://localhost:3000
+npm run build        # production build (forces NODE_ENV=production — see note below)
+npm start            # serve the production build
+npm run typecheck    # tsc --noEmit
 ```
+
+> **Build gotcha:** `next build` must run with `NODE_ENV=production`. The `build` script sets it.
+> If `NODE_ENV=development` leaks into the build env, the internal `/404` `/500` error pages fail
+> to prerender with a misleading "Html should not be imported outside of pages/_document" error.
 
 ## Working agreements for agents
 

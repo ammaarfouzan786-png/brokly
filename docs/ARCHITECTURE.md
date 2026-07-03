@@ -1,7 +1,8 @@
 # Architecture
 
-> Starting assumption: Brokly is an online brokerage platform. Validate against the real product
-> before treating this as ground truth.
+> ⚠️ **Superseded.** This document describes an early **stock-brokerage** guess that turned out to
+> be wrong. Brokly is a **real-estate brokerage CRM** with WhatsApp at its core — see `README.md`
+> and `CLAUDE.md` for the real, as-built architecture. Kept here for history only.
 
 ## Overview
 

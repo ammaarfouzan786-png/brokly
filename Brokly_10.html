@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brokly — working app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F0;--surface:#fff;--surface2:#F7F9F8;--ink:#0E1F18;--ink2:#56655E;--ink3:#8A968F;
+  --line:#E5EBE7;--line2:#EEF2F0;--brand:#0B6B3A;--brandD:#06472A;--brandSoft:#E4F2EA;
+  --gold:#C98A15;--goldSoft:#FBF0DA;--ai:#6F58F0;--aiSoft:#ECE8FE;--hot:#E0473C;--hotSoft:#FCE7E5;
+  --money:#12925A;--moneySoft:#E1F4EB;--wa:#1FAD55;--waSoft:#E3F6EA;--blue:#2E72D2;--blueSoft:#E7F0FB;
+  --shadow:0 1px 2px rgba(14,31,24,.05),0 8px 24px rgba(14,31,24,.06);--shadowLg:0 16px 50px rgba(14,31,24,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+.bric{font-family:'Bricolage Grotesque','Inter',sans-serif}
+.tnum{font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:14px;color:var(--ink)}
+a{text-decoration:none}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#cdd6d1;border-radius:8px}
+
+.shell{max-width:1080px;margin:0 auto;min-height:100vh}
+.topnav{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.topnav .inner{display:flex;align-items:center;gap:12px;padding:11px 16px;max-width:1080px;margin:0 auto}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brandD));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;box-shadow:0 3px 10px rgba(11,107,58,.35);flex:none}
+.brandname{font-weight:700;font-size:17px;letter-spacing:-.02em;flex:none}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{padding:9px 13px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--ink2);background:none;border:none;white-space:nowrap;position:relative}
+.tab.on{background:var(--ink);color:#fff}
+.tab .dot{position:absolute;top:5px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--hot)}
+.who{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1A7A4E,#0B6B3A);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+
+main{padding:20px 16px 90px}
+.screen{display:none;animation:fade .25s ease}.screen.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.h1{font-size:23px;font-weight:700;letter-spacing:-.02em}
+.sub{font-size:13.5px;color:var(--ink2);margin-top:3px}
+.sectionh{font-size:16px;font-weight:700;margin:24px 0 12px;display:flex;justify-content:space-between;align-items:center}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 15px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:13.5px;font-weight:600}
+.btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.ink{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.ai{background:linear-gradient(135deg,var(--ai),#5B3BE0);border:none;color:#fff;box-shadow:0 6px 18px rgba(96,60,230,.32)}
+.btn.wa{background:var(--wa);border-color:var(--wa);color:#fff}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn.sm{padding:8px 12px;font-size:12.5px;border-radius:9px}
+.btn.full{width:100%}
+.btn:active{transform:scale(.98)}
+.tagline{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.03em;display:inline-flex;align-items:center;gap:4px}
+.field{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:14px 0 6px}
+.in{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px 13px;background:var(--surface2);outline:none}
+.in:focus{border-color:var(--brand);background:#fff}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.muted{color:var(--ink2)}.tiny{font-size:11.5px}.sm{font-size:13px}
+.pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;display:inline-flex;align-items:center;gap:4px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat .i{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;font-size:16px}
+.stat .n{font-size:26px;font-weight:700}.stat .l{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.brief{margin-top:16px;border-radius:18px;padding:18px;color:#fff;background:linear-gradient(135deg,#171033,#3B2A8C 60%,#6F58F0);box-shadow:0 14px 30px rgba(70,46,180,.3)}
+.brief .e{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;opacity:.85}
+.brief h3{font-size:17px;margin:8px 0 6px;font-weight:700}
+.brief p{font-size:13px;opacity:.92;line-height:1.5}
+
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;cursor:pointer}
+.pcard .img{height:130px;position:relative}
+.pcard .img .b1{position:absolute;top:9px;left:9px;display:flex;gap:6px}
+.pcard .bd{padding:13px;flex:1;display:flex;flex-direction:column}
+.price{font-size:19px;font-weight:700}
+.spec{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:12px;color:var(--ink2)}
+.pcard .acts{display:flex;gap:7px;margin-top:auto;padding-top:12px}
+
+.matchbar{height:8px;border-radius:8px;background:var(--line);overflow:hidden}
+.matchbar i{display:block;height:100%;border-radius:8px}
+.reason{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--brand);background:var(--brandSoft);padding:3px 8px;border-radius:6px;margin:3px 4px 0 0}
+
+.linkrow{display:flex;gap:13px;align-items:center;padding:14px;border-bottom:1px solid var(--line2)}
+.linkrow:last-child{border-bottom:none}
+.linkico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;font-size:17px;font-weight:700}
+.urlbox{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:6px 9px;display:inline-block;margin-top:4px}
+
+.overlay{position:fixed;inset:0;z-index:60;background:rgba(14,31,24,.5);display:none;align-items:center;justify-content:center;padding:18px}
+.overlay.on{display:flex;animation:fade .25s}
+.phone{width:390px;max-width:100%;height:760px;max-height:92vh;background:var(--bg);border-radius:38px;overflow:hidden;position:relative;box-shadow:var(--shadowLg),0 0 0 9px #0E1F18}
+.phone .pscroll{position:absolute;inset:0;overflow-y:auto}
+.phbar{height:30px;background:#0E1F18}
+.buyer-top{background:linear-gradient(135deg,var(--brand),var(--brandD));color:#fff;padding:16px;position:relative}
+.modalbox{background:#fff;border-radius:20px;width:580px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:var(--shadowLg);position:relative}
+.closex{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.92);border:none;display:flex;align-items:center;justify-content:center;font-size:18px;z-index:5}
+
+.inv-line{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line2);font-size:14px}
+.inv-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:12px;border-top:2px solid var(--ink)}
+.track{display:flex;margin-top:18px}
+.track .s{flex:1;text-align:center;position:relative;font-size:11px;color:var(--ink2);font-weight:600}
+.track .d{width:24px;height:24px;border-radius:50%;background:var(--line);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:12px;position:relative;z-index:2}
+.track .s.done .d{background:var(--money)}.track .s.cur .d{background:var(--gold)}
+.track .s::before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:2px;background:var(--line)}
+.track .s:first-child::before{display:none}.track .s.done::before{background:var(--money)}
+
+/* inbox */
+.chatlist .linkrow{cursor:pointer}
+.thread{display:flex;flex-direction:column;height:560px}
+.thread .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--surface2)}
+.bub{max-width:78%;padding:9px 13px;border-radius:14px;font-size:13.5px;line-height:1.4}
+.bub.them{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:5px}
+.bub.me{background:var(--brand);color:#fff;align-self:flex-end;border-bottom-right-radius:5px}
+.suggest{display:flex;gap:7px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);background:#fff}
+.sgchip{font-size:12px;font-weight:600;color:var(--ai);background:var(--aiSoft);border:none;padding:7px 11px;border-radius:9px}
+.composer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:#fff}
+
+/* co-broke */
+.lock{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ink2);background:var(--surface2);border:1px dashed var(--line);padding:6px 10px;border-radius:9px}
+.brokerchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink)}
+.brokerav{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#6F58F0,#5B3BE0);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+.swatch{width:30px;height:30px;border-radius:8px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.swatch.on{box-shadow:0 0 0 2px var(--ink)}
+.logo-preview{height:200px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--line)}
+
+/* AI assistant */
+.fab{position:fixed;bottom:22px;right:22px;z-index:70;width:58px;height:58px;border-radius:18px;border:none;background:linear-gradient(135deg,var(--ai),#5B3BE0);color:#fff;font-size:24px;box-shadow:0 12px 30px rgba(96,60,230,.45);display:flex;align-items:center;justify-content:center}
+.asst{position:fixed;bottom:90px;right:22px;z-index:71;width:370px;max-width:calc(100vw - 28px);height:540px;max-height:72vh;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadowLg);display:none;flex-direction:column;overflow:hidden}
+.asst.on{display:flex;animation:fade .2s}
+.asst .ahead{padding:14px 16px;background:linear-gradient(135deg,#171033,#5B3BE0);color:#fff}
+.asst .amsgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;background:var(--surface2)}
+.asst .composer{border-top:1px solid var(--line)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:12px;z-index:95;opacity:0;transition:.3s;box-shadow:var(--shadowLg);white-space:nowrap;max-width:90vw;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;color:var(--ink3);font-size:13px;padding:30px}
+@media(max-width:560px){.modalbox{width:100%}.h1{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topnav"><div class="inner">
+    <div class="logo">b</div><div class="brandname">Brokly</div>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-s="home" onclick="nav('home')">Home</button>
+      <button class="tab" data-s="inbox" onclick="nav('inbox')">Inbox<span class="dot" id="inbox-dot"></span></button>
+      <button class="tab" data-s="stock" onclick="nav('stock')">Stock</button>
+      <button class="tab" data-s="clients" onclick="nav('clients')">Clients</button>
+      <button class="tab" data-s="cobroke" onclick="nav('cobroke')">Co-broke</button>
+      <button class="tab" data-s="links" onclick="nav('links')">Links</button>
+      <button class="tab" data-s="leads" onclick="nav('leads')">Leads</button>
+      <button class="tab" data-s="money" onclick="nav('money')">Money</button>
+      <button class="tab" data-s="lawyer" onclick="nav('lawyer')">Lawyer</button>
+      <button class="tab" data-s="brand" onclick="nav('brand')">Brand</button>
+    </div>
+    <div class="who"><div class="avatar">AK</div></div>
+  </div></div>
+
+  <main>
+    <!-- HOME -->
+    <section class="screen on" id="home">
+      <div class="h1">Hello, Ammar</div><div class="sub">Indiranagar · Bengaluru · here's your brokerage today</div>
+      <div class="brief"><div class="e">✦ AI morning brief</div><h3 id="brief-h"></h3><p id="brief-p"></p>
+        <button class="btn sm" style="margin-top:12px;background:rgba(255,255,255,.16);border:none;color:#fff" onclick="openAsst()">Ask the assistant ›</button></div>
+      <div class="sectionh">At a glance</div>
+      <div class="stats" id="home-stats"></div>
+      <div class="sectionh">Your full flow <span class="tiny muted">tap any step</span></div>
+      <div class="card" style="padding:6px" id="flow-steps"></div>
+    </section>
+
+    <!-- INBOX -->
+    <section class="screen" id="inbox">
+      <div class="h1">WhatsApp inbox</div><div class="sub">Every client chat in one place, with AI-suggested replies. <span class="muted">(Demo — real two-way needs the Cloud API backend.)</span></div>
+      <div class="sectionh">Chats</div>
+      <div class="card chatlist" id="chat-list"></div>
+    </section>
+
+    <!-- STOCK -->
+    <section class="screen" id="stock">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div><div class="h1">My stock</div><div class="sub" id="stock-count"></div></div>
+        <button class="btn brand" onclick="openAddProp()">+ Add property</button>
+      </div>
+      <div id="addprop" style="display:none">
+        <div class="card" style="padding:16px;margin-top:14px">
+          <b>New property</b>
+          <div class="row2"><div><label class="field">Title</label><input class="in" id="np-title" placeholder="3BHK, Prestige Lakeside"></div>
+            <div><label class="field">Area</label><select class="in" id="np-area"><option>Whitefield</option><option>HSR Layout</option><option>Sarjapur</option><option>Hebbal</option><option>Indiranagar</option><option>Koramangala</option></select></div></div>
+          <div class="row2"><div><label class="field">Type</label><select class="in" id="np-type"><option>Apartment</option><option>Villa</option><option>Plot</option><option>Commercial</option></select></div>
+            <div><label class="field">Config (BHK)</label><select class="in" id="np-bhk"><option value="2">2 BHK</option><option value="3" selected>3 BHK</option><option value="4">4 BHK</option><option value="0">NA</option></select></div></div>
+          <div class="row2"><div><label class="field">Sale price (₹)</label><input class="in tnum" id="np-price" inputmode="numeric" placeholder="14500000"></div>
+            <div><label class="field">Sq ft</label><input class="in tnum" id="np-sqft" inputmode="numeric" placeholder="1575"></div></div>
+          <div style="display:flex;gap:8px;margin-top:14px"><button class="btn" onclick="closeAddProp()">Cancel</button><button class="btn brand" onclick="saveProp()">Save property</button></div>
+        </div>
+      </div>
+      <div class="sectionh">Listings <span class="tiny muted">tap a card to open</span></div>
+      <div class="grid" id="stock-grid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))"></div>
+    </section>
+
+    <!-- CLIENTS -->
+    <section class="screen" id="clients">
+      <div class="h1">Clients & AI matching</div>
+      <div class="sub">A client tells you what they want — Brokly ranks your stock and builds them a link.</div>
+      <div class="card" style="padding:16px;margin-top:16px">
+        <b>New client requirement</b>
+        <div class="row2"><div><label class="field">Client name</label><input class="in" id="rq-name" placeholder="Rajesh Iyer"></div>
+          <div><label class="field">WhatsApp / phone</label><input class="in" id="rq-phone" placeholder="9198xxxxxxx" inputmode="numeric"></div></div>
+        <div class="row2"><div><label class="field">Type</label><select class="in" id="rq-type"><option>Apartment</option><option>Villa</option><option>Plot</option><option>Commercial</option></select></div>
+          <div><label class="field">Config</label><select class="in" id="rq-bhk"><option value="2">2 BHK</option><option value="3" selected>3 BHK</option><option value="4">4 BHK</option><option value="0">Any</option></select></div></div>
+        <div class="row2"><div><label class="field">Preferred area</label><select class="in" id="rq-area"><option>Whitefield</option><option>HSR Layout</option><option>Sarjapur</option><option>Hebbal</option><option>Indiranagar</option><option>Koramangala</option></select></div>
+          <div><label class="field">Urgency</label><select class="in" id="rq-urg"><option>Urgent</option><option>This month</option><option>Browsing</option></select></div></div>
+        <div class="row2"><div><label class="field">Budget min (₹)</label><input class="in tnum" id="rq-min" inputmode="numeric" placeholder="16000000"></div>
+          <div><label class="field">Budget max (₹)</label><input class="in tnum" id="rq-max" inputmode="numeric" placeholder="19000000"></div></div>
+        <button class="btn ai full" style="margin-top:16px" onclick="runMatch()">✦ Save client & run AI match</button>
+      </div>
+      <div id="match-result" style="display:none">
+        <div class="sectionh" id="match-title">Matches</div>
+        <div class="sub" style="margin-bottom:10px" id="match-sub"></div>
+        <div class="grid" id="match-grid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))"></div>
+        <div class="card" style="padding:16px;margin-top:14px;background:var(--brandSoft);border-color:#CFE7DA">
+          <b>Turn the top matches into a link for this client</b>
+          <div class="sm muted" style="margin:6px 0 12px">A <b>smart collection</b> link auto-adds future stock that fits this brief.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn gold" onclick="makeCollectionLink()">Create smart collection link</button>
+            <button class="btn" onclick="nav('links')">Go to Links</button></div>
+        </div>
+      </div>
+      <div class="sectionh">Saved clients</div>
+      <div class="card" id="client-list"></div>
+    </section>
+
+    <!-- CO-BROKE -->
+    <section class="screen" id="cobroke">
+      <div class="h1">Co-broking marketplace</div>
+      <div class="sub">Inventory from other Brokly brokers. The owner stays <b>out-of-band</b> (hidden) — you deal through the listing broker, commission protected.</div>
+      <div class="stats" id="cobroke-stats" style="margin-top:14px"></div>
+      <div class="sectionh">Open inventory <span class="tiny muted">request to co-broke</span></div>
+      <div class="grid" id="cobroke-grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))"></div>
+      <div class="sectionh">My co-broke deals</div>
+      <div class="card" id="cobroke-mine"></div>
+    </section>
+
+    <!-- LINKS -->
+    <section class="screen" id="links">
+      <div class="h1">Shareable links</div>
+      <div class="sub">Every link you share, in one place. Views, enquiries, and exactly what your client sees.</div>
+      <div class="sectionh">Your links <span class="tiny muted" id="link-count"></span></div>
+      <div class="card" id="link-list"></div>
+      <div class="card" style="padding:16px;margin-top:16px;background:var(--aiSoft);border-color:#DAD2FB">
+        <b style="color:var(--ai)">How "smart collection" links keep updating</b>
+        <div class="sm" style="margin:6px 0 12px;line-height:1.5">A collection link is tied to a client's brief, not a fixed list. Add stock that matches and it appears in their link automatically.</div>
+        <button class="btn ai sm" onclick="simulateNewStock()">▶ Simulate: a new matching property gets listed</button>
+      </div>
+    </section>
+
+    <!-- LEADS -->
+    <section class="screen" id="leads">
+      <div class="h1">Leads</div><div class="sub">Enquiries from your links — scored by AI, tied to the property.</div>
+      <div style="display:flex;gap:8px;margin:14px 0" id="lead-filters">
+        <button class="btn sm ink" data-f="all" onclick="setLeadFilter(this)">All</button>
+        <button class="btn sm" data-f="HOT" onclick="setLeadFilter(this)">🔥 Hot</button>
+        <button class="btn sm" data-f="WARM" onclick="setLeadFilter(this)">Warm</button>
+      </div>
+      <div class="card" id="lead-list"></div>
+    </section>
+
+    <!-- MONEY -->
+    <section class="screen" id="money">
+      <div class="h1">Money</div><div class="sub">Commission calculator and invoice generation — the math actually runs.</div>
+      <div class="card" style="padding:18px;margin-top:16px">
+        <b>Commission calculator</b>
+        <div class="row2"><div><label class="field">Deal / property</label><select class="in" id="cm-prop" onchange="syncDealValue()"></select></div>
+          <div><label class="field">Client</label><input class="in" id="cm-client" placeholder="Buyer name"></div></div>
+        <div class="row2"><div><label class="field">Sale value (₹)</label><input class="in tnum" id="cm-value" inputmode="numeric" oninput="calcComm()"></div>
+          <div><label class="field">Commission %</label><input class="in tnum" id="cm-rate" value="1" inputmode="decimal" oninput="calcComm()"></div></div>
+        <div class="row2"><div><label class="field">Co-broked?</label><select class="in" id="cm-cobroke" onchange="calcComm()"><option value="0">No — full commission</option><option value="1">Yes — split with partner</option></select></div>
+          <div><label class="field">Your split %</label><input class="in tnum" id="cm-split" value="50" inputmode="numeric" oninput="calcComm()"></div></div>
+        <div class="card" style="padding:16px;margin-top:16px;background:var(--brandSoft);border-color:#CFE7DA">
+          <div class="inv-line" style="border-color:#CFE7DA"><span class="muted">Gross commission</span><b id="o-gross" class="tnum"></b></div>
+          <div class="inv-line" style="border-color:#CFE7DA"><span class="muted" id="o-share-l">Your share</span><b id="o-share" class="tnum"></b></div>
+          <div class="inv-line" style="border-color:#CFE7DA"><span class="muted">GST (18%)</span><b id="o-gst" class="tnum"></b></div>
+          <div class="inv-total"><span class="muted">You invoice</span><b class="bric tnum" id="o-total" style="font-size:24px;color:var(--brandD)"></b></div>
+        </div>
+        <button class="btn brand full" style="margin-top:14px" onclick="genInvoice()">Generate GST invoice + payment link</button>
+      </div>
+      <div class="sectionh">Invoices</div>
+      <div class="card" id="inv-list"></div>
+    </section>
+
+    <!-- LAWYER -->
+    <section class="screen" id="lawyer">
+      <div class="h1">InBuilt lawyer</div><div class="sub">Stamp duty estimates and ready-to-sign deed drafts — Karnataka.</div>
+      <div class="card" style="padding:18px;margin-top:16px">
+        <b>Stamp duty & registration calculator</b>
+        <div class="row2"><div><label class="field">Property value (₹)</label><input class="in tnum" id="sd-value" inputmode="numeric" value="15000000" oninput="calcStamp()"></div>
+          <div><label class="field">Transaction</label><select class="in" id="sd-type" onchange="calcStamp()"><option value="sale">Sale / purchase</option><option value="rent">Rental agreement</option></select></div></div>
+        <div class="card" style="padding:16px;margin-top:14px;background:var(--goldSoft);border-color:#EAD9AE" id="sd-out"></div>
+      </div>
+      <div class="card" style="padding:18px;margin-top:16px">
+        <b>Deed generator</b>
+        <div class="row2"><div><label class="field">Document</label><select class="in" id="dg-type"><option value="rent">Rental agreement</option><option value="sale">Sale agreement</option></select></div>
+          <div><label class="field">Property</label><select class="in" id="dg-prop"></select></div></div>
+        <div class="row2"><div><label class="field">Party A (owner / seller)</label><input class="in" id="dg-a" value="Ammar Khan"></div>
+          <div><label class="field">Party B (tenant / buyer)</label><input class="in" id="dg-b" placeholder="Counterparty name"></div></div>
+        <div class="row2"><div><label class="field">Amount (₹ / mo or sale)</label><input class="in tnum" id="dg-amt" inputmode="numeric" value="55000"></div>
+          <div><label class="field">Term</label><input class="in" id="dg-term" value="11 months"></div></div>
+        <button class="btn ink full" style="margin-top:14px" onclick="genDeed()">Generate deed draft</button>
+      </div>
+    </section>
+
+    <!-- BRAND -->
+    <section class="screen" id="brand">
+      <div class="h1">Brand kit</div><div class="sub">Generate a logo for your brokerage — preview live, download the SVG.</div>
+      <div class="grid" style="grid-template-columns:1fr;margin-top:16px;max-width:560px">
+        <div class="card" style="padding:18px">
+          <div class="row2"><div><label class="field">Brand / agent name</label><input class="in" id="lg-name" value="Ammar Estates" oninput="drawLogo()"></div>
+            <div><label class="field">Tagline</label><input class="in" id="lg-tag" value="Bengaluru real estate" oninput="drawLogo()"></div></div>
+          <label class="field">Mark shape</label>
+          <div style="display:flex;gap:8px" id="lg-shape">
+            <button class="btn sm on" data-shape="rounded" onclick="pickShape(this)">Rounded</button>
+            <button class="btn sm" data-shape="circle" onclick="pickShape(this)">Circle</button>
+            <button class="btn sm" data-shape="shield" onclick="pickShape(this)">Shield</button></div>
+          <label class="field">Colour</label><div style="display:flex;gap:8px;flex-wrap:wrap" id="lg-colors"></div>
+          <label class="field">Style</label>
+          <div style="display:flex;gap:8px" id="lg-style">
+            <button class="btn sm on" data-style="bric" onclick="pickStyle(this)">Bold display</button>
+            <button class="btn sm" data-style="inter" onclick="pickStyle(this)">Clean sans</button></div>
+          <div class="logo-preview" id="logo-preview" style="margin-top:16px"></div>
+          <button class="btn ink full" style="margin-top:14px" onclick="downloadLogo()">Download SVG</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- overlays -->
+<div class="overlay" id="buyer-overlay"><div class="phone"><div class="pscroll" id="buyer-scroll"></div></div></div>
+<div class="overlay" id="modal"><div class="modalbox"><button class="closex" onclick="closeOverlay('modal')">✕</button><div id="modal-body"></div></div></div>
+
+<!-- AI assistant -->
+<button class="fab" id="fab" onclick="toggleAsst()">✦</button>
+<div class="asst" id="asst">
+  <div class="ahead"><div style="display:flex;justify-content:space-between;align-items:center">
+    <div><div style="font-weight:700">Brokly AI</div><div class="tiny" style="opacity:.85">Knows your stock, leads & clients</div></div>
+    <button onclick="toggleAsst()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:8px">✕</button>
+  </div></div>
+  <div class="amsgs" id="asst-msgs"></div>
+  <div class="composer"><input class="in" id="asst-in" placeholder="Ask anything…" onkeydown="if(event.key==='Enter')asstSend()"><button class="btn ai" onclick="asstSend()">Send</button></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+/* ============ helpers ============ */
+const inr = n => '₹'+Math.round(+n||0).toLocaleString('en-IN');
+const inrShort = n => { n=+n||0; if(n>=10000000) return '₹'+(n/10000000).toFixed(2).replace(/\.00$/,'')+' Cr'; if(n>=100000) return '₹'+(n/100000).toFixed(2).replace(/\.00$/,'')+' L'; return inr(n); };
+const GRAD=['linear-gradient(120deg,#3a5a45,#6e8f78)','linear-gradient(120deg,#4a4f6a,#8a90b5)','linear-gradient(120deg,#5a4a3a,#a8906e)','linear-gradient(120deg,#3a5a5a,#6e9b9b)','linear-gradient(120deg,#5a4a4a,#9b7e7e)','linear-gradient(120deg,#3a4a5a,#6e7e9b)'];
+let GID=0; const grad=()=>GRAD[(GID++)%GRAD.length];
+const uid=p=>p+Math.random().toString(36).slice(2,7);
+const val=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+const esc=s=>(s||'').replace(/</g,'&lt;');
+
+/* ============ state ============ */
+let properties=[
+  {id:'p1',title:'3BHK · Prestige Lakeside',type:'Apartment',area:'Whitefield',bhk:3,sqft:1575,price:14500000,g:grad(),onMarket:false},
+  {id:'p2',title:'4BHK Penthouse · Sobha Dream',type:'Apartment',area:'Sarjapur',bhk:4,sqft:1840,price:21000000,g:grad(),onMarket:false},
+  {id:'p3',title:'2BHK · Purva Skydale',type:'Apartment',area:'HSR Layout',bhk:2,sqft:1280,price:7800000,g:grad(),onMarket:false},
+  {id:'p4',title:'3BHK · Brigade Northridge',type:'Apartment',area:'Hebbal',bhk:3,sqft:1450,price:11800000,g:grad(),onMarket:false},
+  {id:'p5',title:'3BHK Villa · Adarsh Palm',type:'Villa',area:'Sarjapur',bhk:3,sqft:2200,price:17800000,g:grad(),onMarket:true},
+];
+let clients=[{id:'c1',name:'Rajesh Iyer',phone:'919900112233',type:'Villa',bhk:3,area:'Sarjapur',min:16000000,max:19000000,urg:'Urgent'}];
+let links=[];
+let leads=[{id:uid('l'),name:'Priya Menon',phone:'919845567890',msg:'Can I visit the Whitefield 3BHK this Saturday?',score:88,temp:'HOT',propId:'p1',linkId:null}];
+let invoices=[];
+let lastMatch=null;
+let leadFilter='all';
+
+let conversations=[
+  {id:'w1',name:'Priya Menon',phone:'919845567890',tag:'HOT',unread:1,msgs:[
+    {me:false,t:'Hi, saw the Whitefield 3BHK link 👍'},{me:false,t:'Can I visit this Saturday? And is parking included?'}]},
+  {id:'w2',name:'Rajesh Iyer',phone:'919900112233',tag:'',unread:0,msgs:[
+    {me:false,t:'Looking for a villa in Sarjapur, budget around 1.8Cr'},{me:true,t:'I have a couple of options, sending a link now.'}]},
+  {id:'w3',name:'Sneha R. (co-broker)',phone:'919812000111',tag:'CO-BROKE',unread:2,msgs:[
+    {me:false,t:'Your client liked my Brigade Cornerstone listing?'},{me:false,t:'Happy to do 50:50 on it.'}]},
+];
+
+let cobrokeMarket=[
+  {id:'m1',title:'3BHK · Brigade Cornerstone',type:'Apartment',area:'Whitefield',bhk:3,sqft:1620,price:13500000,split:50,broker:'Sneha R.',score:88,g:grad(),locked:true},
+  {id:'m2',title:'4BHK Villa · Prestige Glenwood',type:'Villa',area:'Sarjapur',bhk:4,sqft:3200,price:32000000,split:50,broker:'Deepa M.',score:94,g:grad(),locked:true},
+  {id:'m3',title:'2BHK · Sobha HRC Pristine',type:'Apartment',area:'Hebbal',bhk:2,sqft:1180,price:9200000,split:45,broker:'Karthik V.',score:76,g:grad(),locked:true},
+  {id:'m4',title:'Office 4,500 sqft · UB City',type:'Commercial',area:'Indiranagar',bhk:0,sqft:4500,price:0,rent:450000,split:40,broker:'Imran K.',score:81,g:grad(),locked:true},
+];
+let myCobroke=[];
+
+/* ============ nav ============ */
+function nav(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
+  const el=document.getElementById(s); if(el)el.classList.add('on');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.s===s));
+  window.scrollTo(0,0);
+  ({home:renderHome,inbox:renderInbox,stock:renderStock,clients:renderClients,cobroke:renderCobroke,
+    links:renderLinks,leads:renderLeads,lawyer:renderLawyer,brand:initBrand,
+    money:()=>{fillDealSelect();calcComm();renderInvoices();}}[s]||(()=>{}))();
+}
+let tt; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2300);}
+function openOverlay(id){document.getElementById(id).classList.add('on');}
+function closeOverlay(id){document.getElementById(id).classList.remove('on');}
+function showModal(html){document.getElementById('modal-body').innerHTML=html;openOverlay('modal');}
+
+/* ============ HOME ============ */
+function renderHome(){
+  document.getElementById('brief-h').textContent="1 unmatched brief, 3 unread chats, 1 hot lead waiting";
+  document.getElementById('brief-p').textContent="Rajesh's Sarjapur villa brief is ready to match. Priya wants a Saturday visit on the Whitefield 3BHK. Sneha proposed 50:50 on a co-broke.";
+  const hot=leads.filter(l=>l.temp==='HOT').length, views=links.reduce((a,b)=>a+b.views,0);
+  document.getElementById('home-stats').innerHTML=[
+    ['🏠',properties.length,'Active stock','var(--brandSoft)','var(--brand)'],
+    ['🔥',hot,'Hot leads','var(--hotSoft)','var(--hot)'],
+    ['🤝',cobrokeMarket.length,'Co-broke open','var(--aiSoft)','var(--ai)'],
+    ['👁',views,'Link views','var(--goldSoft)','var(--gold)'],
+  ].map(s=>`<div class="stat"><div class="i" style="background:${s[3]};color:${s[4]}">${s[0]}</div><div class="n bric tnum">${s[1]}</div><div class="l">${s[2]}</div></div>`).join('');
+  const steps=[['inbox','📥','Reply to clients','Unified WhatsApp inbox + AI replies','var(--waSoft)','var(--wa)'],
+    ['stock','🏠','Add & open your stock','Tap any listing to open it','var(--brandSoft)','var(--brand)'],
+    ['clients','✦','Client asks → AI matches','Rank your stock to a brief','var(--aiSoft)','var(--ai)'],
+    ['cobroke','🤝','Co-broke marketplace','Other brokers\' inventory, owner protected','var(--aiSoft)','var(--ai)'],
+    ['links','🔗','Generate shareable link','Single or smart collection','var(--goldSoft)','var(--gold)'],
+    ['leads','🎯','Leads come back scored','Tied to the property','var(--hotSoft)','var(--hot)'],
+    ['money','₹','Commission → invoice','GST, co-broke split, payment link','var(--moneySoft)','var(--money)'],
+    ['lawyer','⚖️','Stamp duty + deeds','Generate agreements','var(--blueSoft)','var(--blue)']];
+  document.getElementById('flow-steps').innerHTML=steps.map(s=>`<div class="linkrow" onclick="nav('${s[0]}')"><div class="linkico" style="background:${s[4]};color:${s[5]}">${s[1]}</div><div style="flex:1"><b>${s[2]}</b><div class="sm muted">${s[3]}</div></div><span class="muted">›</span></div>`).join('');
+}
+
+/* ============ INBOX ============ */
+function renderInbox(){
+  const unread=conversations.reduce((a,c)=>a+c.unread,0);
+  document.getElementById('inbox-dot').style.display=unread?'block':'none';
+  document.getElementById('chat-list').innerHTML=conversations.map(c=>{
+    const last=c.msgs[c.msgs.length-1];
+    const tagc=c.tag==='HOT'?['var(--hotSoft)','var(--hot)']:c.tag==='CO-BROKE'?['var(--aiSoft)','var(--ai)']:null;
+    return `<div class="linkrow" onclick="openThread('${c.id}')">
+      <div class="linkico" style="background:var(--waSoft);color:var(--wa)">${c.name[0]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;gap:7px;align-items:center"><b>${c.name}</b>${tagc?`<span class="pill" style="background:${tagc[0]};color:${tagc[1]}">${c.tag}</span>`:''}</div>
+        <div class="sm muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${last.me?'You: ':''}${esc(last.t)}</div>
+      </div>
+      ${c.unread?`<span class="pill" style="background:var(--wa);color:#fff">${c.unread}</span>`:''}
+    </div>`;
+  }).join('');
+}
+function suggestReplies(c){
+  const last=c.msgs.filter(m=>!m.me).slice(-1)[0]; const t=(last?last.t:'').toLowerCase();
+  const s=[];
+  if(/visit|saturday|sunday|weekend/.test(t)){s.push('Saturday 11am works — shall I confirm?');}
+  if(/parking/.test(t)){s.push('Yes, 2 covered car parks included.');}
+  if(/price|budget|negoti/.test(t)){s.push('Owner can consider a fair offer — what works for you?');}
+  if(/co-?broke|50|split/.test(t)){s.push('Deal — 50:50 it is. Sending the agreement.');}
+  if(!s.length){s.push('Sharing the details now 👍','Can you share your budget & timeline?');}
+  return s.slice(0,3);
+}
+function openThread(id){
+  const c=conversations.find(x=>x.id===id); c.unread=0; renderInbox();
+  const body=`<div style="padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">
+      <div class="linkico" style="width:40px;height:40px;background:var(--waSoft);color:var(--wa)">${c.name[0]}</div>
+      <div><b>${c.name}</b><div class="tiny muted">${c.phone}</div></div>
+      <a class="btn sm wa" style="margin-left:auto" href="https://wa.me/${c.phone}" target="_blank">Open WhatsApp</a></div>
+    <div class="thread">
+      <div class="msgs" id="thread-msgs">${c.msgs.map(m=>`<div class="bub ${m.me?'me':'them'}">${esc(m.t)}</div>`).join('')}</div>
+      <div class="suggest" id="thread-sg">${suggestReplies(c).map(s=>`<button class="sgchip" onclick="useSuggest('${id}',this)">✦ ${esc(s)}</button>`).join('')}</div>
+      <div class="composer"><input class="in" id="thread-in" placeholder="Type a reply…" onkeydown="if(event.key==='Enter')sendThread('${id}')"><button class="btn brand" onclick="sendThread('${id}')">Send</button></div>
+    </div>`;
+  showModal(body);
+}
+function useSuggest(id,btn){ document.getElementById('thread-in').value=btn.textContent.replace('✦ ','').trim(); }
+function sendThread(id){
+  const c=conversations.find(x=>x.id===id); const t=val('thread-in'); if(!t)return;
+  c.msgs.push({me:true,t}); document.getElementById('thread-in').value='';
+  document.getElementById('thread-msgs').insertAdjacentHTML('beforeend',`<div class="bub me">${esc(t)}</div>`);
+  document.getElementById('thread-msgs').scrollTop=9e9;
+  toast('Message sent (demo)');
+}
+
+/* ============ STOCK ============ */
+function renderStock(){
+  document.getElementById('stock-count').textContent=properties.length+' active listings';
+  document.getElementById('stock-grid').innerHTML=properties.map(p=>propCard(p)).join('');
+}
+function propCard(p){
+  return `<div class="pcard" onclick="openPropDetail('${p.id}')">
+    <div class="img" style="background:${p.g}"><div class="b1"><span class="tagline" style="background:var(--money);color:#fff">● Live</span>${p.onMarket?'<span class="tagline" style="background:var(--ai);color:#fff">🤝 Co-broke</span>':''}</div></div>
+    <div class="bd">
+      <div class="price bric tnum">${inrShort(p.price)}</div>
+      <div style="font-size:13.5px;font-weight:600;margin-top:4px">${p.title}</div>
+      <div class="spec"><span>📍 ${p.area}</span><span>${p.bhk?p.bhk+' BHK':p.type}</span><span>◧ ${p.sqft} sqft</span></div>
+      <div class="acts">
+        <button class="btn sm" style="flex:1" onclick="event.stopPropagation();makeSingleLink('${p.id}')">Share link</button>
+        <button class="btn sm brand" style="flex:1" onclick="event.stopPropagation();previewSingle('${p.id}')">Preview</button>
+      </div>
+    </div></div>`;
+}
+function openPropDetail(id){
+  const p=properties.find(x=>x.id===id); if(!p)return;
+  const link=links.find(l=>l.kind==='single'&&l.propId===id);
+  showModal(`<div style="height:170px;background:${p.g};border-radius:20px 20px 0 0;position:relative"><span class="tagline" style="position:absolute;top:14px;left:14px;background:var(--money);color:#fff">● Live</span></div>
+    <div style="padding:20px">
+      <div class="price bric tnum" style="font-size:26px">${inrShort(p.price)}</div>
+      <div style="font-size:17px;font-weight:700;margin-top:3px">${p.title}</div>
+      <div class="sm muted">📍 ${p.area}, Bengaluru · ${p.type}</div>
+      <div class="card" style="padding:14px;margin-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;box-shadow:none">
+        <div><div class="bric tnum" style="font-size:18px;font-weight:700">${p.bhk||'—'}</div><div class="tiny muted">Bedrooms</div></div>
+        <div><div class="bric tnum" style="font-size:18px;font-weight:700">${p.sqft}</div><div class="tiny muted">Sq ft</div></div>
+        <div><div class="bric tnum" style="font-size:18px;font-weight:700">${inr(Math.round(p.price/(p.sqft||1)))}</div><div class="tiny muted">per sqft</div></div>
+      </div>
+      <label class="field">Shareable link ${link?'':'(create one)'}</label>
+      <div style="display:flex;gap:8px;align-items:center"><div class="urlbox" style="flex:1;margin:0">${link?'brokly.app/'+link.slug:'— not shared yet —'}</div>
+        ${link?`<button class="btn sm" onclick="copyLink('${link.slug}')">Copy</button>`:`<button class="btn sm brand" onclick="makeSingleLink('${p.id}');closeOverlay('modal')">Create</button>`}</div>
+      <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
+        <button class="btn brand" onclick="closeOverlay('modal');previewSingle('${p.id}')">Preview as buyer</button>
+        <button class="btn ${p.onMarket?'':'ai'}" onclick="toggleMarket('${p.id}')">${p.onMarket?'On co-broke ✓':'List for co-broking'}</button>
+        <button class="btn" onclick="markSold('${p.id}')">Mark sold</button>
+      </div>
+    </div>`);
+}
+function toggleMarket(id){const p=properties.find(x=>x.id===id);p.onMarket=!p.onMarket;openPropDetail(id);renderStock();toast(p.onMarket?'Listed on co-broke marketplace — owner kept out-of-band':'Removed from marketplace');}
+function markSold(id){toast('Marked sold — jump to Money to invoice the commission');closeOverlay('modal');}
+function openAddProp(){document.getElementById('addprop').style.display='block';}
+function closeAddProp(){document.getElementById('addprop').style.display='none';}
+function saveProp(){
+  const t=val('np-title'); if(!t)return toast('Add a title');
+  properties.unshift({id:uid('p'),title:t,type:val('np-type'),area:val('np-area'),bhk:+val('np-bhk'),sqft:+val('np-sqft')||0,price:+val('np-price')||0,g:grad(),onMarket:false});
+  closeAddProp(); renderStock(); toast('Property added ✓');
+  ['np-title','np-price','np-sqft'].forEach(i=>document.getElementById(i).value='');
+}
+
+/* ============ MATCHING ============ */
+function matchScore(p,req){
+  let s=0; const r=[];
+  if(p.type===req.type){s+=30;r.push('Type fits');} else if((p.type==='Villa'&&req.type==='Apartment')||(p.type==='Apartment'&&req.type==='Villa')){s+=8;}
+  if(req.bhk===0){s+=18;} else if(p.bhk===req.bhk){s+=25;r.push(req.bhk+'BHK match');} else if(Math.abs(p.bhk-req.bhk)===1){s+=12;r.push('Close on config');}
+  if(p.area===req.area){s+=25;r.push('In '+p.area);} else {s+=6;}
+  if(p.price>=req.min&&p.price<=req.max){s+=22;r.push('In budget');}
+  else{const mid=(req.min+req.max)/2,off=Math.abs(p.price-mid)/(mid||1);if(off<=0.12){s+=12;r.push('Just off budget');}else if(off<=0.25){s+=5;}}
+  return {score:Math.min(100,s),reasons:r};
+}
+function runMatch(){
+  const name=val('rq-name'); if(!name)return toast('Add the client name');
+  const req={id:uid('c'),name,phone:val('rq-phone'),type:val('rq-type'),bhk:+val('rq-bhk'),area:val('rq-area'),min:+val('rq-min')||0,max:+val('rq-max')||999999999,urg:val('rq-urg')};
+  clients.unshift(req);
+  const ranked=properties.map(p=>({p,...matchScore(p,req)})).sort((a,b)=>b.score-a.score);
+  lastMatch={clientId:req.id,ranked}; showMatchResult(req,ranked); renderClientList();
+  toast('AI matched '+ranked.filter(x=>x.score>=55).length+' properties');
+}
+function showMatchResult(req,ranked){
+  document.getElementById('match-result').style.display='block';
+  document.getElementById('match-title').textContent='Matches for '+req.name;
+  const good=ranked.filter(x=>x.score>=55).length;
+  document.getElementById('match-sub').textContent=`${req.type} · ${req.bhk?req.bhk+'BHK':'any'} · ${req.area} · ${inrShort(req.min)}–${inrShort(req.max)} — ${good} strong fits ranked below`;
+  document.getElementById('match-grid').innerHTML=ranked.map(m=>{
+    const c=m.score>=75?'var(--money)':m.score>=55?'var(--gold)':'var(--ink3)';
+    return `<div class="pcard" onclick="openPropDetail('${m.p.id}')">
+      <div class="img" style="background:${m.p.g}"><div class="b1"><span class="tagline" style="background:${c};color:#fff">${m.score}% match</span></div></div>
+      <div class="bd"><div class="price bric tnum">${inrShort(m.p.price)}</div>
+        <div style="font-size:13.5px;font-weight:600;margin-top:4px">${m.p.title}</div>
+        <div class="spec"><span>📍 ${m.p.area}</span><span>${m.p.bhk?m.p.bhk+' BHK':m.p.type}</span></div>
+        <div class="matchbar" style="margin-top:10px"><i style="width:${m.score}%;background:${c}"></i></div>
+        <div style="margin-top:8px">${m.reasons.map(x=>`<span class="reason">✓ ${x}</span>`).join('')||'<span class="tiny muted">Weak fit</span>'}</div>
+      </div></div>`;
+  }).join('');
+  document.getElementById('match-result').scrollIntoView({behavior:'smooth'});
+}
+function renderClients(){ renderClientList(); }
+function renderClientList(){
+  const el=document.getElementById('client-list');
+  el.innerHTML=clients.length?clients.map(c=>`<div class="linkrow">
+    <div class="linkico" style="background:var(--aiSoft);color:var(--ai)">${c.name[0]}</div>
+    <div style="flex:1"><b>${c.name}</b><div class="sm muted">${c.type} · ${c.bhk?c.bhk+'BHK':'any'} · ${c.area} · ${inrShort(c.min)}–${inrShort(c.max)} · ${c.urg}</div></div>
+    <button class="btn sm" onclick="rematch('${c.id}')">Re-match</button></div>`).join(''):'<div class="empty">No clients yet.</div>';
+}
+function rematch(id){
+  const req=clients.find(c=>c.id===id); if(!req)return;
+  const ranked=properties.map(p=>({p,...matchScore(p,req)})).sort((a,b)=>b.score-a.score);
+  lastMatch={clientId:req.id,ranked}; nav('clients'); showMatchResult(req,ranked);
+}
+
+/* ============ CO-BROKE ============ */
+function renderCobroke(){
+  document.getElementById('cobroke-stats').innerHTML=[
+    ['🤝',cobrokeMarket.length,'Open inventory','var(--aiSoft)','var(--ai)'],
+    ['✅',myCobroke.length,'My co-broke deals','var(--moneySoft)','var(--money)'],
+    ['🔒','OOB','Owners protected','var(--goldSoft)','var(--gold)'],
+  ].map(s=>`<div class="stat"><div class="i" style="background:${s[3]};color:${s[4]}">${s[0]}</div><div class="n bric tnum" style="font-size:${typeof s[1]==='string'?'20px':'26px'}">${s[1]}</div><div class="l">${s[2]}</div></div>`).join('');
+  document.getElementById('cobroke-grid').innerHTML=cobrokeMarket.map(m=>`<div class="pcard" style="cursor:default">
+    <div class="img" style="background:${m.g}"><div class="b1"><span class="tagline" style="background:var(--ai);color:#fff">Split ${m.split}%</span></div></div>
+    <div class="bd">
+      <div class="price bric tnum">${m.price?inrShort(m.price):inrShort(m.rent)+'/mo'}</div>
+      <div style="font-size:13.5px;font-weight:600;margin-top:4px">${m.title}</div>
+      <div class="spec"><span>📍 ${m.area}</span><span>${m.bhk?m.bhk+' BHK':m.type}</span><span>◧ ${m.sqft} sqft</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+        <span class="brokerchip"><span class="brokerav">${m.broker[0]}</span>${m.broker} · ★${m.score}</span>
+      </div>
+      <div class="lock" style="margin-top:10px">🔒 Owner hidden (OOB) — deal via broker</div>
+      <button class="btn ai sm full" style="margin-top:10px" onclick="requestCobroke('${m.id}')">Request to co-broke</button>
+    </div></div>`).join('');
+  renderMyCobroke();
+}
+function renderMyCobroke(){
+  const el=document.getElementById('cobroke-mine');
+  el.innerHTML=myCobroke.length?myCobroke.map(d=>`<div class="linkrow">
+    <div class="linkico" style="background:var(--moneySoft);color:var(--money)">🤝</div>
+    <div style="flex:1"><b>${d.title}</b><div class="sm muted">With ${d.broker} · split ${d.split}% · ${inrShort(d.price||d.rent)} </div></div>
+    <span class="pill" style="background:var(--goldSoft);color:var(--gold)">${d.status}</span></div>`).join(''):'<div class="empty">No co-broke deals yet. Request one above.</div>';
+}
+function requestCobroke(id){
+  const m=cobrokeMarket.find(x=>x.id===id);
+  showModal(`<div style="padding:22px">
+    <div style="font-size:18px;font-weight:700">Co-broke agreement</div>
+    <div class="sm muted" style="margin-top:3px">Standardised split agreement — protects both sides.</div>
+    <div class="card" style="padding:16px;margin-top:14px;box-shadow:none;background:var(--surface2)">
+      <div class="inv-line"><span class="muted">Property</span><b>${m.title}</b></div>
+      <div class="inv-line"><span class="muted">Listing broker</span><b>${m.broker} · ★${m.score}</b></div>
+      <div class="inv-line"><span class="muted">Your commission split</span><b>${m.split}%</b></div>
+      <div class="inv-line" style="border:none"><span class="muted">Owner contact</span><b>🔒 Out-of-band (protected)</b></div>
+    </div>
+    <div class="card" style="padding:13px;margin-top:12px;background:var(--goldSoft);border-color:#EAD9AE;box-shadow:none">
+      <div class="tiny" style="font-weight:700;color:var(--gold)">⚖️ COMMISSION PROTECTION</div>
+      <div class="tiny" style="margin-top:4px;line-height:1.5">If your buyer transacts on this property, your ${m.split}% is locked in by this agreement. The owner is never exposed to you directly, and you're never exposed to the owner.</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:18px"><button class="btn" onclick="closeOverlay('modal')">Cancel</button>
+      <button class="btn ai" style="flex:1" onclick="acceptCobroke('${id}')">Accept & connect with ${m.broker.split(' ')[0]}</button></div>
+  </div>`);
+}
+function acceptCobroke(id){
+  const i=cobrokeMarket.findIndex(x=>x.id===id); const m=cobrokeMarket[i];
+  myCobroke.unshift({...m,status:'Connected'}); cobrokeMarket.splice(i,1);
+  closeOverlay('modal'); nav('cobroke');
+  conversations.unshift({id:uid('w'),name:m.broker+' (co-broker)',phone:'9198120'+Math.floor(1000+Math.random()*8999),tag:'CO-BROKE',unread:1,msgs:[{me:false,t:`Great, ${m.split}:${100-m.split} on ${m.title}. I'll share availability.`}]});
+  toast('Co-broke accepted — chat opened with '+m.broker);
+}
+
+/* ============ LINKS ============ */
+function makeCollectionLink(){
+  if(!lastMatch)return toast('Run a match first');
+  const req=clients.find(c=>c.id===lastMatch.clientId);
+  links.unshift({id:uid('lk'),kind:'collection',clientId:req.id,label:`${req.name} · ${req.type} ${req.bhk?req.bhk+'BHK':''} in ${req.area}`,
+    slug:'c/'+req.name.toLowerCase().replace(/\s+/g,'-')+'-'+Math.random().toString(36).slice(2,6),views:0,enquiries:0,created:Date.now()});
+  toast('Smart collection link created ✓'); nav('links');
+}
+function makeSingleLink(pid){
+  const ex=links.find(l=>l.kind==='single'&&l.propId===pid); if(ex){toast('Link already exists — see Links');return;}
+  const p=properties.find(x=>x.id===pid);
+  links.unshift({id:uid('lk'),kind:'single',propId:pid,label:p.title,slug:'p/'+pid+Math.random().toString(36).slice(2,5),views:0,enquiries:0,created:Date.now()});
+  toast('Link created — see it in Links');
+}
+function collectionProps(link){
+  const req=clients.find(c=>c.id===link.clientId); if(!req)return [];
+  return properties.map(p=>({p,...matchScore(p,req)})).filter(x=>x.score>=55).sort((a,b)=>b.score-a.score);
+}
+function renderLinks(){
+  document.getElementById('link-count').textContent=links.length+' active';
+  const el=document.getElementById('link-list');
+  if(!links.length){el.innerHTML='<div class="empty">No links yet. Match a client or share a property.</div>';return;}
+  el.innerHTML=links.map(l=>{
+    const count=l.kind==='collection'?collectionProps(l).length:1;
+    const ico=l.kind==='collection'?['var(--goldSoft)','var(--gold)','◳']:['var(--blueSoft)','var(--blue)','◰'];
+    return `<div class="linkrow">
+      <div class="linkico" style="background:${ico[0]};color:${ico[1]}">${ico[2]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>${l.label}</b>
+          <span class="pill" style="background:${ico[0]};color:${ico[1]}">${l.kind==='collection'?'Smart collection · '+count+' homes':'Single property'}</span></div>
+        <div class="urlbox">brokly.app/${l.slug}</div>
+        <div class="sm muted" style="margin-top:6px">👁 ${l.views} views · 💬 ${l.enquiries} enquiries${l.kind==='collection'?' · auto-updates':''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="btn sm brand" onclick="openBuyer('${l.id}')">Open as buyer</button>
+        <button class="btn sm" onclick="copyLink('${l.slug}')">Copy link</button>
+      </div></div>`;
+  }).join('');
+}
+function copyLink(slug){const u='https://brokly.app/'+slug;try{navigator.clipboard&&navigator.clipboard.writeText(u);}catch(e){}toast('Copied '+u);}
+function simulateNewStock(){
+  const coll=links.find(l=>l.kind==='collection');
+  if(!coll){toast('Create a smart collection link first (Clients → match → create link)');return;}
+  const req=clients.find(c=>c.id===coll.clientId);
+  properties.unshift({id:uid('p'),title:'3BHK Villa · Sobha Lifestyle',type:req.type,area:req.area,bhk:req.bhk||3,sqft:2100,price:Math.round((req.min+req.max)/2),g:grad(),onMarket:false});
+  renderLinks(); toast('New matching home listed → '+req.name+"'s link updated automatically");
+}
+
+/* ============ BUYER VIEW ============ */
+function previewSingle(pid){ openBuyerLink({id:'tmp',kind:'single',propId:pid},true); }
+function openBuyer(id){ const l=links.find(x=>x.id===id); if(l)l.views++; openBuyerLink(l,false); if(document.getElementById('links').classList.contains('on'))renderLinks(); }
+function openBuyerLink(l,preview){
+  const head=`<div class="phbar"></div><div class="buyer-top">
+      <button class="closex" onclick="closeOverlay('buyer-overlay')" style="background:rgba(255,255,255,.25);color:#fff">✕</button>
+      <div style="font-size:11px;opacity:.85;font-weight:600">${preview?'PREVIEW · what your client sees':'SHARED BY AMMAR ESTATES'}</div>
+      <div style="font-size:18px;font-weight:700;margin-top:4px" class="bric">${l.kind==='collection'?'Homes picked for you':'Your property'}</div>
+      <div style="font-size:12px;opacity:.9;margin-top:2px">Tap a home to see details and enquire</div></div>`;
+  let body='';
+  if(l.kind==='collection'){
+    const list=collectionProps(l);
+    body=list.length?list.map(m=>buyerCard(m.p,m.score,l.id)).join(''):'<div class="empty">No homes yet — new matches appear here.</div>';
+  } else body=buyerDetail(properties.find(x=>x.id===l.propId),l.id);
+  document.getElementById('buyer-scroll').innerHTML=head+`<div style="padding:14px">${body}</div>`;
+  openOverlay('buyer-overlay');
+}
+function buyerCard(p,score,linkId){
+  return `<div class="card" style="overflow:hidden;margin-bottom:12px;cursor:pointer" onclick="buyerOpenDetail('${p.id}','${linkId}')">
+    <div style="height:140px;background:${p.g};position:relative"><span class="tagline" style="position:absolute;top:10px;left:10px;background:var(--money);color:#fff">${score}% for you</span></div>
+    <div style="padding:13px"><div class="price bric tnum">${inrShort(p.price)}</div>
+      <div style="font-weight:600;margin-top:3px">${p.title}</div>
+      <div class="spec"><span>📍 ${p.area}</span><span>${p.bhk} BHK</span><span>◧ ${p.sqft} sqft</span></div></div></div>`;
+}
+function buyerOpenDetail(pid,linkId){
+  document.getElementById('buyer-scroll').innerHTML=`<div class="phbar"></div>`+buyerDetail(properties.find(x=>x.id===pid),linkId,true);
+  document.getElementById('buyer-scroll').scrollTop=0;
+}
+function buyerDetail(p,linkId,back){
+  const sd=Math.round(p.price*0.05),reg=Math.round(p.price*0.01),total=sd+reg+Math.round(sd*0.1);
+  return `<div style="position:relative"><div style="height:230px;background:${p.g}"></div>
+    ${back?`<button class="closex" style="left:14px;right:auto;top:40px" onclick="reopenBuyerList('${linkId}')">‹</button>`:''}
+    <button class="closex" style="top:40px" onclick="closeOverlay('buyer-overlay')">✕</button></div>
+  <div style="padding:16px">
+    <div style="display:flex;gap:6px;margin-bottom:8px"><span class="tagline" style="background:var(--moneySoft);color:var(--money)">For sale</span><span class="tagline" style="background:var(--line);color:var(--ink2)">${p.type}</span></div>
+    <div class="price bric tnum" style="font-size:26px">${inrShort(p.price)}</div>
+    <div style="font-size:13px;color:var(--ink2)" class="tnum">${inr(Math.round(p.price/(p.sqft||1)))}/sqft · negotiable</div>
+    <div style="font-size:17px;font-weight:700;margin-top:8px">${p.title}</div>
+    <div class="sm muted">📍 ${p.area}, Bengaluru</div>
+    <div class="card" style="padding:14px;margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div class="bric tnum" style="font-size:18px;font-weight:700">${p.bhk}</div><div class="tiny muted">Bedrooms</div></div>
+      <div><div class="bric tnum" style="font-size:18px;font-weight:700">${p.sqft}</div><div class="tiny muted">Sq ft</div></div>
+      <div><div class="bric tnum" style="font-size:18px;font-weight:700">2</div><div class="tiny muted">Car parks</div></div>
+      <div><div class="bric tnum" style="font-size:18px;font-weight:700">East</div><div class="tiny muted">Facing</div></div></div>
+    <div class="card" style="padding:14px;margin-top:12px;background:linear-gradient(135deg,#171033,#5B3BE0);color:#fff;border:none">
+      <div class="tiny" style="font-weight:700;opacity:.8;letter-spacing:.05em">✦ AI PRICE CHECK</div>
+      <div style="font-weight:700;margin-top:6px">Fairly priced for ${p.area}</div>
+      <div class="tiny" style="opacity:.9;margin-top:3px">Recent sales here ran ₹8,900–9,600/sqft. This sits mid-band.</div></div>
+    <div class="card" style="padding:14px;margin-top:12px"><b style="font-size:14px">Stamp duty estimate</b>
+      <div class="inv-line"><span class="muted">Stamp duty (5%)</span><b class="tnum">${inr(sd)}</b></div>
+      <div class="inv-line" style="border:none"><span class="muted">Reg + cess</span><b class="tnum">${inr(reg+Math.round(sd*0.1))}</b></div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px"><b>Total</b><b class="tnum" style="color:var(--brand)">${inr(total)}</b></div></div>
+    <div class="card" style="padding:14px;margin-top:12px;background:var(--brand);color:#fff;border:none">
+      <div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:700">AK</div>
+      <div><div style="font-weight:700">Ammar Khan</div><div class="tiny"><span style="background:rgba(255,255,255,.2);padding:2px 7px;border-radius:6px">★ Brokly Score 92</span></div></div></div>
+      <button class="btn full" style="margin-top:12px;background:#fff;color:var(--brandD);border:none" onclick="buyerEnquire('${p.id}','${linkId}')">I'm interested — enquire</button></div>
+  </div>`;
+}
+function reopenBuyerList(linkId){const l=links.find(x=>x.id===linkId);if(l&&l.kind==='collection')openBuyerLink(l,false);else closeOverlay('buyer-overlay');}
+let pendingEnq=null;
+function buyerEnquire(pid,linkId){
+  pendingEnq={pid,linkId}; const p=properties.find(x=>x.id===pid);
+  document.getElementById('buyer-scroll').insertAdjacentHTML('beforeend',
+   `<div id="enqform" style="position:fixed;inset:0;background:rgba(14,31,24,.5);display:flex;align-items:flex-end;z-index:10" onclick="if(event.target.id==='enqform')this.remove()">
+      <div style="background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%">
+        <b style="font-size:16px">Enquire · ${p.title}</b>
+        <input class="in" id="enq-name" placeholder="Your name" style="margin-top:10px">
+        <input class="in" id="enq-phone" placeholder="Phone (9198xxxxxxx)" inputmode="numeric" style="margin-top:8px">
+        <textarea class="in" id="enq-msg" rows="2" placeholder="e.g. Can I visit this weekend? Is parking included?" style="margin-top:8px"></textarea>
+        <button class="btn brand full" style="margin-top:10px" onclick="submitEnquiry()">Send enquiry</button></div></div>`);
+}
+function submitEnquiry(){
+  const p=properties.find(x=>x.id===pendingEnq.pid);
+  const name=val('enq-name')||'Live buyer',phone=val('enq-phone'),msg=val('enq-msg')||'Interested in this property';
+  let score=55; const t=msg.toLowerCase();
+  if(/visit|see|saturday|sunday|weekend|today|tomorrow/.test(t))score+=22;
+  if(/buy|book|token|finalis|ready|interested/.test(t))score+=12;
+  if(/price|negoti|emi|loan/.test(t))score+=6; if(phone)score+=5; score=Math.min(97,score);
+  leads.unshift({id:uid('l'),name,phone,msg,score,temp:score>=70?'HOT':score>=45?'WARM':'COLD',propId:p.id,linkId:pendingEnq.linkId});
+  const lk=links.find(x=>x.id===pendingEnq.linkId); if(lk)lk.enquiries++;
+  const f=document.getElementById('enqform'); if(f)f.remove();
+  toast('Enquiry sent → it just landed on your agent dashboard (AI '+score+')');
+}
+
+/* ============ LEADS ============ */
+function setLeadFilter(b){document.querySelectorAll('#lead-filters .btn').forEach(x=>x.classList.remove('ink'));b.classList.add('ink');leadFilter=b.dataset.f;renderLeads();}
+function renderLeads(){
+  const el=document.getElementById('lead-list');
+  const list=leads.filter(l=>leadFilter==='all'||l.temp===leadFilter);
+  if(!list.length){el.innerHTML='<div class="empty">No leads in this view. Open a link as a buyer and enquire.</div>';return;}
+  el.innerHTML=list.map(d=>{
+    const p=properties.find(x=>x.id===d.propId);
+    const col=d.temp==='HOT'?['var(--hotSoft)','var(--hot)']:d.temp==='WARM'?['var(--goldSoft)','var(--gold)']:['var(--line)','var(--ink2)'];
+    return `<div class="linkrow">
+      <div class="linkico" style="background:${d.temp==='HOT'?'var(--hot)':d.temp==='WARM'?'var(--gold)':'var(--ink3)'};color:#fff">${d.name[0]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap"><span class="tagline" style="background:${col[0]};color:${col[1]}">${d.temp}</span><b>${d.name}</b>
+          <span class="pill" style="background:var(--aiSoft);color:var(--ai)">✦ AI ${d.score}</span></div>
+        <div class="sm muted" style="margin-top:3px">${esc(d.msg)}</div>
+        <div class="tiny muted" style="margin-top:2px">↳ ${p?p.title:'property'}</div></div>
+      <div style="display:flex;gap:6px">
+        <a class="btn sm" href="tel:${d.phone}">Call</a>
+        <a class="btn sm wa" href="https://wa.me/${(d.phone||'').replace(/\D/g,'')}" target="_blank" rel="noreferrer">WA</a></div>
+    </div>`;
+  }).join('');
+}
+
+/* ============ MONEY ============ */
+function fillDealSelect(){
+  const sel=document.getElementById('cm-prop');
+  sel.innerHTML=properties.map(p=>`<option value="${p.id}">${p.title} — ${inrShort(p.price)}</option>`).join('');
+  syncDealValue();
+}
+function syncDealValue(){const p=properties.find(x=>x.id===document.getElementById('cm-prop').value);if(p)document.getElementById('cm-value').value=p.price;calcComm();}
+function calcComm(){
+  const v=+val('cm-value')||0,rate=+val('cm-rate')||0,gross=v*rate/100;
+  const cobroke=document.getElementById('cm-cobroke').value==='1',split=+val('cm-split')||0;
+  const share=cobroke?gross*split/100:gross,gst=share*0.18;
+  document.getElementById('o-gross').textContent=inr(gross);
+  document.getElementById('o-share-l').textContent=cobroke?`Your share (${split}%)`:'Your share';
+  document.getElementById('o-share').textContent=inr(share);
+  document.getElementById('o-gst').textContent=inr(gst);
+  document.getElementById('o-total').textContent=inr(share+gst);
+}
+function genInvoice(){
+  const p=properties.find(x=>x.id===document.getElementById('cm-prop').value)||{title:'Deal'};
+  const v=+val('cm-value')||0,rate=+val('cm-rate')||0,gross=v*rate/100;
+  const cobroke=document.getElementById('cm-cobroke').value==='1',split=+val('cm-split')||0;
+  const share=cobroke?gross*split/100:gross,gst=share*0.18,total=share+gst;
+  const inv={id:uid('inv'),no:'BRK-'+(1000+invoices.length+1),title:p.title,client:val('cm-client')||'Buyer',
+    value:v,rate,gross,cobroke,split,share,gst,total,status:'Generated',date:new Date().toLocaleDateString('en-IN')};
+  invoices.unshift(inv); renderInvoices(); showInvoice(inv.id);
+  toast('Invoice '+inv.no+' generated + Razorpay link created');
+}
+function renderInvoices(){
+  const el=document.getElementById('inv-list');
+  el.innerHTML=invoices.length?invoices.map(v=>`<div class="linkrow">
+    <div class="linkico" style="background:var(--moneySoft);color:var(--money)">₹</div>
+    <div style="flex:1"><div style="display:flex;gap:8px;align-items:center"><b>${v.no}</b><span class="pill" style="background:var(--goldSoft);color:var(--gold)">${v.status}</span></div>
+      <div class="sm muted">${v.title} · ${v.client} · ${v.date}</div></div>
+    <div style="text-align:right"><div class="bric tnum" style="font-size:17px;font-weight:700">${inr(v.total)}</div>
+      <button class="btn sm" style="margin-top:4px" onclick="showInvoice('${v.id}')">View</button></div>
+  </div>`).join(''):'<div class="empty">No invoices yet. Use the calculator above and hit Generate.</div>';
+}
+function showInvoice(id){
+  const v=invoices.find(x=>x.id===id); if(!v)return;
+  const steps=['Generated','Sent','Viewed','Paid'],cur=steps.indexOf(v.status);
+  showModal(`<div style="padding:26px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><div style="display:flex;align-items:center;gap:8px"><div class="logo" style="width:30px;height:30px;font-size:16px">b</div><b>Ammar Estates</b></div>
+        <div class="tiny muted" style="margin-top:4px">GSTIN 29ABCDE1234F1Z5 · Bengaluru</div></div>
+      <div style="text-align:right"><div style="font-size:20px;font-weight:700">INVOICE</div><div class="tiny muted">${v.no} · ${v.date}</div></div></div>
+    <div style="margin-top:18px;font-size:13px"><span class="muted">Billed to</span><br><b>${v.client}</b><br><span class="muted">Brokerage commission — ${v.title}</span></div>
+    <div style="margin-top:18px">
+      <div class="inv-line"><span class="muted">Sale value</span><b class="tnum">${inr(v.value)}</b></div>
+      <div class="inv-line"><span class="muted">Commission @ ${v.rate}%</span><b class="tnum">${inr(v.gross)}</b></div>
+      ${v.cobroke?`<div class="inv-line"><span class="muted">Your co-broke share (${v.split}%)</span><b class="tnum">${inr(v.share)}</b></div>`:''}
+      <div class="inv-line"><span class="muted">Taxable amount</span><b class="tnum">${inr(v.share)}</b></div>
+      <div class="inv-line"><span class="muted">GST (18%)</span><b class="tnum">${inr(v.gst)}</b></div>
+      <div class="inv-total"><b>Total payable</b><b class="bric tnum" style="font-size:24px">${inr(v.total)}</b></div></div>
+    <div class="track">${steps.map((s,i)=>`<div class="s ${i<cur?'done':i===cur?'cur':''}"><div class="d">${i<cur?'✓':i+1}</div>${s}</div>`).join('')}</div>
+    <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap">
+      <button class="btn wa" onclick="advanceInv('${v.id}')">Send on WhatsApp</button>
+      <button class="btn gold" onclick="copyLink('pay/${v.no}')">Copy payment link</button>
+      <button class="btn ink" onclick="window.print()">Print / PDF</button></div>
+  </div>`);
+}
+function advanceInv(id){const v=invoices.find(x=>x.id===id);const steps=['Generated','Sent','Viewed','Paid'];let i=steps.indexOf(v.status);if(i<steps.length-1)v.status=steps[i+1];showInvoice(id);renderInvoices();toast('Marked: '+v.status);}
+
+/* ============ LAWYER ============ */
+function renderLawyer(){ calcStamp(); const sel=document.getElementById('dg-prop'); sel.innerHTML=properties.map(p=>`<option value="${p.id}">${p.title}</option>`).join(''); }
+function calcStamp(){
+  const v=+val('sd-value')||0,type=document.getElementById('sd-type').value;
+  let out='';
+  if(type==='sale'){
+    const stamp=v*0.05,cess=v*0.005,reg=v*0.01,total=stamp+cess+reg;
+    out=`<div class="inv-line" style="border-color:#EAD9AE"><span class="muted">Stamp duty (5%)</span><b class="tnum">${inr(stamp)}</b></div>
+      <div class="inv-line" style="border-color:#EAD9AE"><span class="muted">Cess (0.5%)</span><b class="tnum">${inr(cess)}</b></div>
+      <div class="inv-line" style="border-color:#EAD9AE"><span class="muted">Registration (1%)</span><b class="tnum">${inr(reg)}</b></div>
+      <div class="inv-total" style="border-top-color:#C98A15"><b>Total payable</b><b class="bric tnum" style="font-size:22px;color:var(--gold)">${inr(total)}</b></div>`;
+  } else {
+    const stamp=Math.max(v*11*0.005,500),reg=200;
+    out=`<div class="sm muted" style="margin-bottom:8px">Karnataka rental agreement (11-month), on ₹${(+val('sd-value')||0).toLocaleString('en-IN')}/mo</div>
+      <div class="inv-line" style="border-color:#EAD9AE"><span class="muted">Stamp (0.5% of annual)</span><b class="tnum">${inr(stamp)}</b></div>
+      <div class="inv-line" style="border-color:#EAD9AE"><span class="muted">Registration</span><b class="tnum">${inr(reg)}</b></div>
+      <div class="inv-total" style="border-top-color:#C98A15"><b>Total</b><b class="bric tnum" style="font-size:22px;color:var(--gold)">${inr(stamp+reg)}</b></div>`;
+  }
+  document.getElementById('sd-out').innerHTML=out;
+}
+function genDeed(){
+  const type=document.getElementById('dg-type').value;
+  const p=properties.find(x=>x.id===document.getElementById('dg-prop').value)||{title:'the Property',area:'Bengaluru'};
+  const A=val('dg-a')||'Party A',B=val('dg-b')||'Party B',amt=+val('dg-amt')||0,term=val('dg-term')||'11 months';
+  const today=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  let title,bodyText;
+  if(type==='rent'){
+    title='RENTAL AGREEMENT';
+    bodyText=`This Rental Agreement is made on ${today} at Bengaluru between <b>${A}</b> ("Lessor") and <b>${B}</b> ("Lessee").
+
+1. The Lessor lets to the Lessee the property: <b>${p.title}, ${p.area}, Bengaluru</b>.
+2. The tenancy is for a term of <b>${term}</b>, commencing on the date above.
+3. The Lessee shall pay a monthly rent of <b>${inr(amt)}</b>, payable in advance on or before the 5th of each month.
+4. The Lessee shall pay a refundable security deposit of <b>${inr(amt*10)}</b>.
+5. The Lessee shall use the premises for residential purposes only and maintain it in good condition.
+6. Either party may terminate this agreement with one (1) month's written notice.
+7. This agreement is governed by the laws of Karnataka, India.`;
+  } else {
+    title='AGREEMENT TO SELL';
+    bodyText=`This Agreement to Sell is made on ${today} at Bengaluru between <b>${A}</b> ("Seller") and <b>${B}</b> ("Purchaser").
+
+1. The Seller agrees to sell the property: <b>${p.title}, ${p.area}, Bengaluru</b>, free of encumbrances.
+2. The total sale consideration is <b>${inr(amt)}</b>.
+3. The Purchaser has paid an advance/token of <b>${inr(Math.round(amt*0.1))}</b>, receipt acknowledged.
+4. The balance shall be paid at the time of registration of the sale deed, within ${term}.
+5. The Seller shall hand over vacant, peaceful possession on completion.
+6. Stamp duty and registration charges shall be borne by the Purchaser.
+7. This agreement is governed by the laws of Karnataka, India.`;
+  }
+  showModal(`<div style="padding:26px">
+    <div style="text-align:center;border-bottom:2px solid var(--ink);padding-bottom:12px">
+      <div style="font-size:11px;letter-spacing:.2em;color:var(--ink2)">DRAFT · NOT LEGAL ADVICE</div>
+      <div class="bric" style="font-size:20px;font-weight:800;margin-top:4px">${title}</div></div>
+    <div style="white-space:pre-line;font-size:13.5px;line-height:1.7;margin-top:16px">${bodyText}</div>
+    <div style="display:flex;justify-content:space-between;margin-top:36px;font-size:13px">
+      <div style="text-align:center"><div style="border-top:1px solid var(--ink);padding-top:6px;width:130px">${A}</div></div>
+      <div style="text-align:center"><div style="border-top:1px solid var(--ink);padding-top:6px;width:130px">${B}</div></div></div>
+    <div style="display:flex;gap:8px;margin-top:22px"><button class="btn ink" onclick="window.print()">Print / PDF</button>
+      <button class="btn" onclick="toast('Draft sent to client on WhatsApp (demo)')">Send to client</button></div>
+    <div class="tiny muted" style="margin-top:12px">Auto-generated draft. Have it reviewed before signing.</div>
+  </div>`);
+}
+
+/* ============ BRAND ============ */
+const LG={shape:'rounded',color:'#0B6B3A',style:'bric'};
+const LCOLORS=['#0B6B3A','#06472A','#171033','#C98A15','#2E72D2','#0E1F18','#B5314A','#1F7A8C'];
+function initBrand(){
+  const c=document.getElementById('lg-colors');
+  if(!c.children.length)c.innerHTML=LCOLORS.map((x,i)=>`<div class="swatch ${i===0?'on':''}" style="background:${x}" onclick="pickColor('${x}',this)"></div>`).join('');
+  drawLogo();
+}
+function pickShape(b){document.querySelectorAll('#lg-shape .btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');LG.shape=b.dataset.shape;drawLogo();}
+function pickStyle(b){document.querySelectorAll('#lg-style .btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');LG.style=b.dataset.style;drawLogo();}
+function pickColor(c,el){document.querySelectorAll('#lg-colors .swatch').forEach(x=>x.classList.remove('on'));el.classList.add('on');LG.color=c;drawLogo();}
+function logoSVG(){
+  const name=val('lg-name')||'Brand',tag=val('lg-tag')||'';
+  const initial=(name.trim()[0]||'B').toUpperCase();
+  const font=LG.style==='bric'?"Bricolage Grotesque, sans-serif":"Inter, sans-serif";
+  let mark='';
+  if(LG.shape==='rounded')mark=`<rect x="0" y="0" width="64" height="64" rx="16" fill="${LG.color}"/>`;
+  else if(LG.shape==='circle')mark=`<circle cx="32" cy="32" r="32" fill="${LG.color}"/>`;
+  else mark=`<path d="M32 0 L64 12 V36 C64 52 50 62 32 64 C14 62 0 52 0 36 V12 Z" fill="${LG.color}"/>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="80" viewBox="0 0 320 80">
+    <g transform="translate(8,8)">${mark}<text x="32" y="33" font-family="${font}" font-size="34" font-weight="800" fill="#fff" text-anchor="middle" dominant-baseline="central">${initial}</text></g>
+    <text x="86" y="${tag?34:46}" font-family="${font}" font-size="28" font-weight="800" fill="${LG.color}">${esc(name)}</text>
+    ${tag?`<text x="88" y="56" font-family="Inter,sans-serif" font-size="12" font-weight="500" fill="#56655E" letter-spacing="1">${esc(tag.toUpperCase())}</text>`:''}</svg>`;
+}
+function drawLogo(){const el=document.getElementById('logo-preview');if(el)el.innerHTML=logoSVG();}
+function downloadLogo(){
+  const blob=new Blob([logoSVG()],{type:'image/svg+xml'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(val('lg-name')||'logo').replace(/\s+/g,'-').toLowerCase()+'-logo.svg';
+  document.body.appendChild(a);a.click();a.remove();toast('Logo downloaded ✓');
+}
+
+/* ============ AI ASSISTANT ============ */
+let asstStarted=false;
+function toggleAsst(){const a=document.getElementById('asst');a.classList.toggle('on');if(a.classList.contains('on')&&!asstStarted){asstStarted=true;asstPush(false,"Hi Ammar 👋 I can see your stock, leads, clients and co-broke deals. Try:");asstChips(['Which leads are hot?','Match Rajesh','Stamp duty on 1.5cr','Draft a WhatsApp for the Whitefield 3BHK']);}}
+function openAsst(){const a=document.getElementById('asst');if(!a.classList.contains('on'))toggleAsst();}
+function asstPush(me,t){document.getElementById('asst-msgs').insertAdjacentHTML('beforeend',`<div class="bub ${me?'me':'them'}" style="${me?'':'background:#fff;border:1px solid var(--line)'}">${t}</div>`);document.getElementById('asst-msgs').scrollTop=9e9;}
+function asstChips(arr){document.getElementById('asst-msgs').insertAdjacentHTML('beforeend',`<div style="display:flex;flex-wrap:wrap;gap:6px">${arr.map(s=>`<button class="sgchip" onclick="asstQuick('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('')}</div>`);document.getElementById('asst-msgs').scrollTop=9e9;}
+function asstQuick(s){document.getElementById('asst-in').value=s;asstSend();}
+function asstSend(){const t=val('asst-in');if(!t)return;asstPush(true,esc(t));document.getElementById('asst-in').value='';setTimeout(()=>asstReply(t),250);}
+function asstReply(q){
+  const t=q.toLowerCase();
+  if(/hot/.test(t)&&/lead/.test(t)){
+    const h=leads.filter(l=>l.temp==='HOT');
+    asstPush(false,h.length?`You have <b>${h.length} hot lead(s)</b>:<br>`+h.map(l=>`• ${l.name} (AI ${l.score}) — "${esc(l.msg)}"`).join('<br>'):'No hot leads right now.');
+    asstChips(['Open Leads']);return;
+  }
+  if(/^match /.test(t)||/match\b/.test(t)){
+    const nm=q.replace(/.*match/i,'').trim().toLowerCase();
+    const c=clients.find(x=>x.name.toLowerCase().includes(nm))||clients[0];
+    if(c){const ranked=properties.map(p=>({p,...matchScore(p,c)})).sort((a,b)=>b.score-a.score).slice(0,3);
+      asstPush(false,`Top matches for <b>${c.name}</b> (${c.type}, ${c.area}):<br>`+ranked.map(m=>`• ${m.p.title} — <b>${m.score}%</b>`).join('<br>'));
+      asstChips(['Open Clients']);}return;
+  }
+  if(/stamp/.test(t)){
+    const m=t.match(/([\d.]+)\s*(cr|crore|l|lakh)?/);let v=0;
+    if(m){v=parseFloat(m[1]);if(/cr/.test(m[2]||''))v*=1e7;else if(/l/.test(m[2]||''))v*=1e5;}
+    if(!v)v=15000000; const stamp=v*0.05,cess=v*0.005,reg=v*0.01;
+    asstPush(false,`On <b>${inrShort(v)}</b> (Karnataka sale):<br>• Stamp duty 5% — ${inr(stamp)}<br>• Cess 0.5% — ${inr(cess)}<br>• Registration 1% — ${inr(reg)}<br><b>Total ${inr(stamp+cess+reg)}</b>`);
+    asstChips(['Open Lawyer']);return;
+  }
+  if(/commission/.test(t)){
+    const nums=(t.match(/[\d.]+/g)||[]).map(Number);let v=nums[0]||15000000;if(v<100)v*=1e7;const rate=nums[1]||1;
+    asstPush(false,`Commission on <b>${inrShort(v)}</b> @ ${rate}%: <b>${inr(v*rate/100)}</b> (+18% GST = ${inr(v*rate/100*1.18)})`);
+    asstChips(['Open Money']);return;
+  }
+  if(/draft|reply|whatsapp|message/.test(t)){
+    asstPush(false,`Here's a draft you can send:<br><i>"Hi! Thanks for your interest in the Whitefield 3BHK (₹1.45 Cr). It's a bright east-facing home with 2 covered parks. I can arrange a visit this weekend — does Saturday 11am work? — Ammar"</i>`);
+    asstChips(['Open Inbox']);return;
+  }
+  if(/co-?broke|cobroke/.test(t)){
+    asstPush(false,`There are <b>${cobrokeMarket.length} co-broke listings</b> open. Best split: ${Math.max(...cobrokeMarket.map(m=>m.split))}% on ${cobrokeMarket.sort((a,b)=>b.split-a.split)[0].title}.`);
+    asstChips(['Open Co-broke']);return;
+  }
+  if(/help|what can|hi|hello|hey/.test(t)){
+    asstPush(false,"I work off your live data. Ask me to find hot leads, match a client, calculate stamp duty or commission, draft a WhatsApp, or summarise co-broke options.");return;
+  }
+  asstPush(false,"I can help with leads, matching, stamp duty, commission, co-broke and drafting messages. Try one of these:");
+  asstChips(['Which leads are hot?','Match Rajesh','Co-broke options']);
+}
+/* chip navigation */
+document.addEventListener('click',e=>{
+  const x=e.target.closest('.sgchip'); if(!x)return; const tx=x.textContent.trim();
+  const mapt={'Open Leads':'leads','Open Clients':'clients','Open Lawyer':'lawyer','Open Money':'money','Open Inbox':'inbox','Open Co-broke':'cobroke'};
+  if(mapt[tx]){nav(mapt[tx]);document.getElementById('asst').classList.remove('on');}
+});
+
+renderHome();
+
+</script>
+</body>
+</html>

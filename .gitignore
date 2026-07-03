@@ -8,6 +8,9 @@ node_modules/
 dist/
 build/
 .next/
+.next-stale/
+.next-bak*/
+.next-old*/
 out/
 coverage/
 *.tsbuildinfo
@@ -31,6 +34,15 @@ yarn-error.log*
 *.sqlite
 *.sqlite3
 prisma/*.db
+
+# Large binaries / archives (too big or unnecessary for GitHub)
+*.zip
+*.mp4
+*.mov
+
+# Prior-attempt reference folder — it's a SEPARATE nested git repo with its own
+# .env.local secrets + large media. Excluded from this repo; push it on its own.
+whatsapp-integration-try/
 
 # OS / editor cruft
 .DS_Store

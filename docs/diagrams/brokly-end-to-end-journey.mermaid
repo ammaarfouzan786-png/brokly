@@ -1,0 +1,42 @@
+flowchart TD
+    subgraph S1["① Stock intake — a listing card from anywhere"]
+        F1["Broker forwards property<br/>text + photos on WhatsApp"]:::wa --> BOT["Brokly bot<br/>Gemini parse → listing"]:::ai
+        E1["Portal lead email mentions<br/>a listing Brokly doesn't have"]:::portal --> BOT
+        M1["Paste / manual add in app"]:::brk --> STOCK
+        BOT --> STOCK["Listing card live<br/>brokly.in/listing/slug"]:::brk
+    end
+
+    subgraph S2["② Reach buyers"]
+        STOCK --> SL["Smart links & collections<br/>auto-updating per buyer brief"]:::brk
+        STOCK --> MKT["Marketing studio<br/>portal copy · reels · ad text"]:::ai
+        MKT --> PORTALS["Broker posts on MB · 99acres<br/>Housing · Instagram"]:::portal
+    end
+
+    subgraph S3["③ Leads from everywhere"]
+        PORTALS -->|"enquiry emails · DMs"| ROUTER["Omni-channel Lead Router<br/>email + Instagram + WhatsApp + links"]:::core
+        SL -->|"buyer enquires"| ROUTER
+        ROUTER --> LEADS["Scored lead cards<br/>+ WhatsApp alert to broker"]:::brk
+    end
+
+    subgraph S4["④ One conversation — WhatsApp"]
+        LEADS --> ENGAGE["Bot intros buyer on WhatsApp<br/>with the Brokly listing link"]:::wa
+        ENGAGE --> CHAT["Unified inbox<br/>AI-suggested replies · brief capture"]:::wa
+        CHAT --> MATCHED["AI match against stock<br/>collection link auto-updates"]:::ai
+    end
+
+    subgraph S5["⑤ Close on Brokly"]
+        MATCHED --> VISIT["Site visit scheduled"]:::brk
+        VISIT --> DEALOK{"Deal happening?"}:::dec
+        DEALOK -->|"yes"| MONEY["Commission calc<br/>GST invoice · payment link"]:::brk
+        MONEY --> LAW["Stamp duty + deed drafts"]:::brk
+        LAW --> CLOSED(["Deal closed — Brokly Score up"]):::brk
+        DEALOK -->|"no — keep looking"| COBROKE["Co-broke marketplace<br/>owner OOB-locked"]:::portal
+        COBROKE --> MATCHED
+    end
+
+    classDef wa fill:#e3f6ea,stroke:#1fad55,stroke-width:1.5px,color:#0e1f18
+    classDef portal fill:#fbf0da,stroke:#c98a15,stroke-width:1.5px,color:#0e1f18
+    classDef brk fill:#e4f2ea,stroke:#0b6b3a,stroke-width:1.5px,color:#0e1f18
+    classDef core fill:#e7f0fb,stroke:#2e72d2,stroke-width:1.5px,color:#0e1f18
+    classDef ai fill:#ece8fe,stroke:#6f58f0,stroke-width:1.5px,color:#0e1f18
+    classDef dec fill:#fce7e5,stroke:#e0473c,stroke-width:1.5px,color:#0e1f18

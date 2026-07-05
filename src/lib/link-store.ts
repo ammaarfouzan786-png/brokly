@@ -22,7 +22,8 @@ export interface LinkPayload {
   slug: string;
   kind: 'single' | 'collection';
   label: string;
-  brokerName: string;
+  brokerName: string; // the broker (person) who shared the link
+  brokerAgency?: string; // agency shown in the "shared by" header (falls back to brokerName)
   brokerScore: number;
   props: LinkProp[];
   created: number;

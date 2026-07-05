@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { LinkPayload } from '@/lib/link-store';
-import { BuyerHeader, BuyerCard, BuyerDetail, EnquiryForm, type EnquiryInput } from './buyer-view';
+import { BuyerHeader, BuyerCard, BuyerDetail, EnquiryForm, buyerBrokerFrom, type EnquiryInput } from './buyer-view';
 
 export function BuyerPublic({ data }: { data: LinkPayload }) {
   const [openId, setOpenId] = useState<string | null>(data.kind === 'single' ? (data.props[0]?.id ?? null) : null);
@@ -26,6 +26,8 @@ export function BuyerPublic({ data }: { data: LinkPayload }) {
 
   const openProp = openId ? data.props.find((p) => p.id === openId) : null;
   const justUpdated = data.kind === 'collection' && !!data.updated && data.updated > data.created;
+  const agency = data.brokerAgency || data.brokerName;
+  const broker = buyerBrokerFrom(data.brokerName, data.brokerScore);
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', background: 'var(--surface2)', minHeight: '100vh', boxShadow: 'var(--shadow)' }}>
@@ -36,7 +38,7 @@ export function BuyerPublic({ data }: { data: LinkPayload }) {
             Enquiry sent!
           </div>
           <div className="muted" style={{ marginTop: 8, fontSize: 14 }}>
-            {data.brokerName} has your details and will reach out shortly on WhatsApp.
+            {agency} has your details and will reach out shortly on WhatsApp.
           </div>
           <button className="btn brand" style={{ marginTop: 20 }} onClick={() => setSent(false)}>
             Back to listings
@@ -45,6 +47,7 @@ export function BuyerPublic({ data }: { data: LinkPayload }) {
       ) : openProp ? (
         <BuyerDetail
           p={openProp}
+          broker={broker}
           onBack={data.kind === 'collection' ? () => setOpenId(null) : undefined}
           onEnquire={() => setEnquireFor(openProp.id)}
         />
@@ -52,7 +55,7 @@ export function BuyerPublic({ data }: { data: LinkPayload }) {
         <>
           <BuyerHeader
             preview={false}
-            sharedBy={data.brokerName}
+            sharedBy={agency}
             title={data.kind === 'collection' ? 'Homes picked for you' : 'Your property'}
             subtitle="Tap a home to see details and enquire"
           />
@@ -62,7 +65,7 @@ export function BuyerPublic({ data }: { data: LinkPayload }) {
                 className="card"
                 style={{ padding: '10px 12px', marginBottom: 12, background: 'var(--goldSoft)', borderColor: 'var(--gold)', color: 'var(--gold)', fontSize: 13, fontWeight: 600 }}
               >
-                ✦ {data.brokerName} just added new homes to your collection — look for the NEW tag.
+                ✦ {agency} just added new homes to your collection — look for the NEW tag.
               </div>
             )}
             {data.props.length ? (

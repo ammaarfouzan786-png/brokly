@@ -1,0 +1,26 @@
+sequenceDiagram
+    autonumber
+    actor B as Buyer
+    participant MB as MagicBricks
+    participant GM as Broker's Gmail
+    participant IN as Brokly Ingest
+    participant AI as Gemini
+    participant DB as Supabase
+    participant WA as WhatsApp Cloud API
+    actor BR as Broker (Arnav)
+
+    B->>MB: Taps "Contact Agent" on the 3BHK listing
+    MB->>GM: Lead email — buyer name, phone, listing ref
+    GM->>IN: Auto-forward to arnav-4821@leads.brokly.in
+    IN->>AI: Extract buyer · phone · portal · property
+    AI-->>IN: Structured lead JSON
+    IN->>DB: Match listing, or auto-create the card
+    IN->>DB: Upsert lead (dedupe by phone) + AI score
+    DB-->>BR: Dashboard card pops live (Realtime)
+    IN->>WA: Alert the broker
+    WA->>BR: New MagicBricks lead — Rahul · 3BHK Whitefield
+    IN->>WA: First-touch utility template to buyer
+    WA->>B: You enquired about 3BHK Whitefield — full details on the Brokly link
+    B->>WA: Buyer replies — 24h free window opens
+    WA->>IN: Webhook — buyer bot Q&A / broker inbox
+    Note over B,BR: Every message after this lives on WhatsApp + Brokly links — the portal is never needed again

@@ -1,5 +1,7 @@
 'use client';
 
+import { BROKER_STORAGE_KEY as KEY } from './broker';
+
 // The onboarded broker's profile (KYC output), persisted locally.
 // In production the Aadhaar/face/RERA checks would go through a real KYC
 // provider; here they're simulated and the result is the verified card.
@@ -16,8 +18,6 @@ export interface BrokerProfile {
   brokerScore: number;
   createdAt: number;
 }
-
-const KEY = 'brokly-broker';
 
 export function loadBroker(): BrokerProfile | null {
   try {

@@ -2,7 +2,20 @@
 
 import { useState } from 'react';
 import { formatInr, formatInrShort, perSqft, bpsOf } from '@/lib/money';
-import { BROKER } from '@/lib/seed';
+import { activeBroker, initialsOf } from '@/lib/broker';
+
+/** The broker identity shown on the buyer-facing card. Public link pages pass
+ *  the identity stored on the link; in-app previews default to the active broker. */
+export interface BuyerBroker {
+  name: string;
+  initials: string;
+  score: number;
+  city: string;
+}
+
+export function buyerBrokerFrom(name: string, score: number): BuyerBroker {
+  return { name, initials: initialsOf(name), score, city: 'Bengaluru' };
+}
 
 // Minimal shape shared by the client store's Property and the server link payload.
 export interface BuyerProp {
@@ -95,15 +108,18 @@ function Mini({ v, l }: { v: React.ReactNode; l: string }) {
 
 export function BuyerDetail({
   p,
+  broker,
   onBack,
   onClose,
   onEnquire,
 }: {
   p: BuyerProp;
+  broker?: BuyerBroker;
   onBack?: () => void;
   onClose?: () => void;
   onEnquire: () => void;
 }) {
+  const b = broker ?? activeBroker();
   const sd = bpsOf(p.price, 500);
   const reg = bpsOf(p.price, 100);
   const cess = bpsOf(sd, 1000);
@@ -140,7 +156,7 @@ export function BuyerDetail({
           {formatInr(perSqft(p.price, p.sqft))}/sqft · negotiable
         </div>
         <div style={{ fontSize: 17, fontWeight: 700, marginTop: 8 }}>{p.title}</div>
-        <div className="sm muted">📍 {p.area}, {BROKER.city}</div>
+        <div className="sm muted">📍 {p.area}, {b.city}</div>
 
         <div className="card" style={{ padding: 14, marginTop: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <Mini v={p.bhk} l="Bedrooms" />
@@ -180,13 +196,13 @@ export function BuyerDetail({
         <div className="card" style={{ padding: 14, marginTop: 12, background: 'var(--brand)', color: '#fff', border: 'none' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
-              {BROKER.initials}
+              {b.initials}
             </div>
             <div>
-              <div style={{ fontWeight: 700 }}>{BROKER.name}</div>
+              <div style={{ fontWeight: 700 }}>{b.name}</div>
               <div className="tiny">
                 <span style={{ background: 'rgba(255,255,255,.2)', padding: '2px 7px', borderRadius: 6 }}>
-                  ★ Brokly Score {BROKER.score}
+                  ★ Brokly Score {b.score}
                 </span>
               </div>
             </div>

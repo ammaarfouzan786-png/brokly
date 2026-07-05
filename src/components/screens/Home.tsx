@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useUI } from '../ui-context';
 import { useStore, type Screen } from '@/lib/store';
-import { BROKER } from '@/lib/seed';
+import { activeBroker } from '@/lib/broker';
 import { cx } from '@/lib/util';
 
 interface Visit { time: string; buyer: string; prop: string; phone: string }
@@ -30,7 +30,8 @@ export function Home() {
   const hot = leads.filter((l) => l.temp === 'HOT');
   const unread = conversations.reduce((a, c) => a + c.unread, 0);
   const unmatched = clients.filter((c) => !links.some((l) => l.kind === 'collection' && l.clientId === c.id));
-  const firstName = BROKER.name.split(' ')[0];
+  const broker = activeBroker();
+  const firstName = broker.name.split(' ')[0];
 
   // ---- daily tasks ----
   const tasks: { id: string; label: string; screen?: Screen }[] = [
@@ -65,7 +66,7 @@ export function Home() {
   return (
     <section className="screen">
       <div className="h1">Hello, {firstName}</div>
-      <div className="sub">{BROKER.area} · {BROKER.city} · here&apos;s your day</div>
+      <div className="sub">{broker.area} · {broker.city} · here&apos;s your day</div>
 
       {/* Hot takes */}
       <div className="sectionh">🔥 Hot takes for today</div>

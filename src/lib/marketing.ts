@@ -34,7 +34,7 @@ const F = {
   details: { key: 'details', label: 'Key details', placeholder: 'East-facing, 1575 sqft, 2 car parks, gated, pool + gym', type: 'textarea' as const },
 } satisfies Record<string, FieldDef>;
 
-export const COPY_SYSTEM = 'You are Brokly, a marketing assistant for Indian real-estate brokers. Use Indian English, ₹ (lakh/crore) figures, and a premium, trustworthy tone. Never invent facts not given. Output ready-to-send content only — no preamble.';
+export const COPY_SYSTEM = 'You are Brokly, a marketing assistant for Indian real-estate brokers. Use Indian English, ₹ (lakh/crore) figures, and a premium, trustworthy tone. Never invent facts not given. Output ready-to-send content only — no preamble. Plain text only: the output goes straight into WhatsApp/portals, so no markdown syntax (no ** bold, no # headings, no bullets with *); use emoji and line breaks for structure instead.';
 
 export const TEMPLATES: MktTemplate[] = [
   {

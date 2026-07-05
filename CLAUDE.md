@@ -21,9 +21,19 @@ Brokly runs a property broker's whole day from one app (web + installable PWA). 
 - **Co-broke** — other brokers' inventory, owner kept out-of-band (OOB), commission protected.
 - **Money** — commission (co-broke split + 18% GST) → GST invoice + payment link (`src/lib/commission.ts`).
 - **Lawyer** — Karnataka stamp-duty/registration calc + rental/sale deed drafts (`src/lib/stampduty.ts`).
-- **Brand** — logo generator with SVG export. Plus a floating **AI assistant** over live data.
+- **Brand** — logo/business-card/avatar generator with SVG export.
+- **Marketing** — template studio (listing copy, ads, reels, analysis) with Gemini or fallback copy.
+- **Pulse** — market-intelligence feed (seeded; refreshes via Gemini when configured).
 
-Region assumptions: India / Bengaluru / ₹ INR / Karnataka. All money is integer **paise**.
+Plus a floating **AI assistant** over live data, and a standalone **listing engine** outside the
+tab shell: `/new` (paste a messy WhatsApp property message → AI-parsed listing), `/listing/[slug]`
+(public listing page), `/dashboard` (live leads + listings). These three need Supabase.
+
+The logged-in broker identity comes from `src/lib/broker.ts` (`activeBroker()` — onboarded profile
+with the seed `BROKER` as fallback). Never render the seed broker's name directly.
+
+Region assumptions: India / Bengaluru / ₹ INR / Karnataka. All money is integer **paise**
+(exception: the Supabase listing engine stores whole rupees — see `src/lib/listing-format.ts`).
 
 ## Tech stack (as built)
 
@@ -31,15 +41,25 @@ Region assumptions: India / Bengaluru / ₹ INR / Karnataka. All money is intege
 - **Styling:** hand-built CSS design system in `src/app/globals.css` (ported from the prototypes).
   Tailwind is **not** used despite the original guess.
 - **State:** Zustand (`src/lib/store.ts`), persisted to `localStorage`.
-- **WhatsApp:** official Meta **Cloud API** — `src/lib/whatsapp.ts` + `src/app/api/whatsapp/*`
-  (webhook verify/receive, send, poll, status). Simulates when unconfigured; see `WHATSAPP_SETUP.md`.
-- **Share links + enquiries:** `/l/[...slug]` + `/api/links` + `/api/enquiry`, backed by
-  process-local in-memory stores (`src/lib/link-store.ts`, `src/lib/server-store.ts`).
+- **WhatsApp — three distinct paths** (don't confuse them):
+  1. **CRM inbox (Cloud API):** `src/lib/whatsapp.ts` + `/api/whatsapp/*` (webhook at
+     `/api/whatsapp/webhook`, send, poll, status). Simulates when unconfigured; `WHATSAPP_SETUP.md`.
+  2. **Listing bot (Cloud API, prod):** `src/lib/whatsapp-cloud.ts` + `/api/webhook/whatsapp`
+     → `src/lib/bot.ts` → Supabase listings.
+  3. **Listing bot (OpenWA, QR demo):** `src/lib/openwa.ts` + `/api/webhook/openwa` → same bot;
+     `OPENWA_SETUP.md`. Choose Cloud API *or* OpenWA, not both.
+- **Persistence layers:** client Zustand→localStorage (CRM); durable KV (`src/lib/kv.ts` —
+  Upstash Redis when configured, else in-memory) for share links/enquiries/inbound messages;
+  **Supabase** (optional — `src/lib/supabase.ts`, `db.ts`, `supabase/schema.sql`) for the listing
+  engine, leads and Realtime broadcast. Everything degrades gracefully when unconfigured.
+- **AI:** Gemini (`src/lib/gemini.ts`, `src/lib/parser.mjs` heuristic fallback) for listing
+  parsing, marketing copy, pulse. Inbox suggestions are rule-based (`src/lib/messages.ts`).
+- **Share links + enquiries:** `/l/[...slug]` + `/api/links` + `/api/enquiry`, on the KV layer
+  (`src/lib/link-store.ts`, `src/lib/server-store.ts`).
 - **Mobile:** installable PWA (`public/manifest.webmanifest`, `public/sw.js`).
 
-> The Postgres/Prisma/Redis/WebSocket stack from the old guess is **not** used — state is
-> client-side + in-memory so the app runs with zero external services. Adding a real DB for
-> persistence + a real auth provider are the natural next steps.
+> The app runs with **zero external services** (demo mode). Supabase, Upstash, Gemini and
+> WhatsApp creds each independently flip their slice to live. Real auth is still the missing piece.
 
 ## Repository layout
 
@@ -54,11 +74,15 @@ Brokly/
 ├── docs/               # ⚠ old stock-brokerage guess — superseded by code + README
 │   └── diagrams/       # Mermaid source (.mermaid)
 ├── public/             # PWA manifest, service worker, icons
+├── supabase/           # schema.sql for the optional listing engine
 ├── Brokly_*.html       # Product prototypes the app was built from
+├── SUPABASE_SETUP.md / WHATSAPP_SETUP.md / OPENWA_SETUP.md   # integration guides
 └── src/
-    ├── app/            # App Router: page, layout, /l/[...slug], /api/* (whatsapp, links, enquiry)
-    ├── components/     # UI: screens/, Shell, Modal, BuyerOverlay, Assistant, Auth…
-    └── lib/            # Domain: store, money, matching, stampduty, commission, whatsapp, seed
+    ├── app/            # App Router: page, /l/[...slug], /listing/[slug], /new, /dashboard,
+    │                   #   /api/* (whatsapp, webhook, links, enquiry, leads, listings, marketing, pulse, parse)
+    ├── components/     # UI: screens/ (12 tabs), Shell, Modal, BuyerOverlay, Assistant, Auth…
+    └── lib/            # Domain: store, broker, money, matching, stampduty, commission,
+                        #   whatsapp/whatsapp-cloud/openwa, bot, gemini, parser, kv, db, seed
 ```
 
 The app is implemented under `src/` (Next.js App Router). The money/matching/commission/stamp-duty

@@ -24,7 +24,8 @@ export async function POST(req: Request) {
   try {
     const { city = 'Bengaluru', areas = [] } = await req.json().catch(() => ({}));
     const areaList = (areas as string[]).filter(Boolean);
-    const prompt = `City: ${city}. Broker's active areas: ${areaList.join(', ') || 'Whitefield, Sarjapur, Indiranagar'}. Generate today's market pulse for this broker.`;
+    const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    const prompt = `Today is ${today}. City: ${city}. Broker's active areas: ${areaList.join(', ') || 'Whitefield, Sarjapur, Indiranagar'}. Generate today's market pulse for this broker. Frame items around the current period — never cite quarters/years older than this date.`;
     let text: string | null = null;
     try {
       text = await generateText(prompt, { system: PULSE_SYSTEM, json: true, temperature: 0.9 });

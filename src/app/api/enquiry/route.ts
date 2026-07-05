@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pushEnquiry, getEnquiriesSince } from '@/lib/link-store';
+import { pushEnquiry, getEnquiriesSince, getLink } from '@/lib/link-store';
 import { sendText } from '@/lib/whatsapp';
 import { enquiryAutoReply } from '@/lib/messages';
 
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const phone = String(b.phone || '');
   const propTitle = String(b.propTitle || 'this property');
   await pushEnquiry({
-    id: 'enq_' + Math.random().toString(36).slice(2, 10),
+    id: 'enq_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
     slug: String(b.slug),
     propId: String(b.propId),
     propTitle,
@@ -24,9 +24,13 @@ export async function POST(req: NextRequest) {
     ts: Date.now(),
   });
   // Instant WhatsApp acknowledgement to the buyer (simulated until Cloud API
-  // creds are set). Best-effort — never block the enquiry on delivery.
+  // creds are set), signed by the broker who published this link.
+  // Best-effort — never block the enquiry on delivery.
   if (phone) {
-    sendText(phone, enquiryAutoReply(name, propTitle)).catch(() => {});
+    const link = await getLink(String(b.slug)).catch(() => null);
+    sendText(phone, enquiryAutoReply(name, propTitle, link?.brokerName)).catch((e) =>
+      console.warn('[enquiry] buyer auto-reply failed:', e),
+    );
   }
   return NextResponse.json({ ok: true });
 }

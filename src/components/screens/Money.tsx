@@ -6,7 +6,7 @@ import { useStore } from '@/lib/store';
 import { commission } from '@/lib/commission';
 import { formatInr, formatInrShort, parseRupees, RUPEE } from '@/lib/money';
 import { COMMS, FIN, K, L, type Comm } from '@/lib/commissions-data';
-import { BROKER } from '@/lib/seed';
+import { activeBroker } from '@/lib/broker';
 import { copyText, cx } from '@/lib/util';
 
 type Tab = 'overview' | 'invoices' | 'gst' | 'reports';
@@ -140,7 +140,7 @@ function CommDetail({ id }: { id: string }) {
         <div className="card" style={{ padding: 14, marginTop: 10 }}>
           <div className="tiny" style={{ fontWeight: 700, color: 'var(--ink2)', letterSpacing: '.4px', marginBottom: 8 }}>CO-BROKING SPLIT</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-            <div className="avatar" style={{ width: 32, height: 32, fontSize: 12 }}>{BROKER.initials}</div>
+            <div className="avatar" style={{ width: 32, height: 32, fontSize: 12 }}>{activeBroker().initials}</div>
             <div style={{ flex: 1, fontSize: 13, fontWeight: 600 }}>You ({c.split.pct.split('/')[0]}%)</div>
             <b>{K(c.split.yours)}</b>
           </div>

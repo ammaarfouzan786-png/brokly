@@ -12,6 +12,14 @@ const AREAS = ['Whitefield', 'HSR Layout', 'Sarjapur', 'Hebbal', 'Indiranagar', 
 const TYPES: PropertyType[] = ['Apartment', 'Villa', 'Plot', 'Commercial'];
 const URG: Urgency[] = ['Urgent', 'This month', 'Browsing'];
 
+// An empty budget form saves as 0 → ₹99.99 Cr; show that honestly as "any
+// budget" instead of a misleading "₹0–₹100 Cr".
+const OPEN_MAX = rupees(900000000);
+function budgetLabel(min: number, max: number): string {
+  if (!min && max >= OPEN_MAX) return 'any budget';
+  return `${formatInrShort(min)}–${formatInrShort(max)}`;
+}
+
 function MatchResult() {
   const clientId = useStore((s) => s.lastMatchClientId);
   const client = useStore((s) => s.clients.find((c) => c.id === clientId));
@@ -33,8 +41,7 @@ function MatchResult() {
     <div ref={ref}>
       <div className="sectionh">Matches for {client.name}</div>
       <div className="sub" style={{ marginBottom: 10 }}>
-        {client.type} · {client.bhk ? client.bhk + 'BHK' : 'any'} · {client.area} · {formatInrShort(client.min)}–
-        {formatInrShort(client.max)} — {good} strong fits ranked below
+        {client.type} · {client.bhk ? client.bhk + 'BHK' : 'any'} · {client.area} · {budgetLabel(client.min, client.max)} — {good} strong fits ranked below
       </div>
       <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill,minmax(250px,1fr))' }}>
         {ranked.map((m) => {
@@ -216,7 +223,7 @@ export function Clients() {
               <div style={{ flex: 1 }}>
                 <b>{c.name}</b>
                 <div className="sm muted">
-                  {c.type} · {c.bhk ? c.bhk + 'BHK' : 'any'} · {c.area} · {formatInrShort(c.min)}–{formatInrShort(c.max)} · {c.urg}
+                  {c.type} · {c.bhk ? c.bhk + 'BHK' : 'any'} · {c.area} · {budgetLabel(c.min, c.max)} · {c.urg}
                 </div>
               </div>
               <button className="btn sm" onClick={() => rematch(c.id)}>

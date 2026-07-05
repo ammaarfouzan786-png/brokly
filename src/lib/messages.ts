@@ -7,7 +7,7 @@
 
 import type { ClientReq, Conversation } from './types';
 import { formatInrShort } from './money';
-import { BROKER } from './seed';
+import { activeBroker } from './broker';
 
 export interface BuyerBrief {
   name?: string;
@@ -57,8 +57,9 @@ export function briefFromClient(c: ClientReq): BuyerBrief {
  * broker first replies). Returns an ordered list of WhatsApp bubbles.
  */
 export function firstContactMessages(brief: BuyerBrief = {}): string[] {
+  const b = activeBroker();
   return [
-    `Hi${hey(brief.name)}! 👋 This is ${BROKER.name} from ${BROKER.agency}. Thanks for reaching out.`,
+    `Hi${hey(brief.name)}! 👋 This is ${b.name} from ${b.agency}. Thanks for reaching out.`,
     `I'll line up the best-matching homes for you. Could you share three quick things?\n📍 Preferred area\n🛏 BHK\n💰 Budget`,
     `Or just tell me what you're looking for in your own words — I'll take it from there.`,
   ];
@@ -95,11 +96,14 @@ export function linkUpdatedMessage(opts: {
   );
 }
 
-/** Auto-reply the moment a buyer submits an enquiry from a public link. */
-export function enquiryAutoReply(name: string | undefined, propTitle: string): string {
+/** Auto-reply the moment a buyer submits an enquiry from a public link.
+ *  `brokerName` lets server callers speak as the broker who owns the link
+ *  (the active-broker fallback only knows the real broker on their device). */
+export function enquiryAutoReply(name: string | undefined, propTitle: string, brokerName?: string): string {
+  const who = brokerName || activeBroker().name;
   return (
     `Thanks${hey(name)}! I've noted your interest in ${propTitle}. ` +
-    `This is ${BROKER.name} — would you like to visit this weekend? I can hold a slot 🗓`
+    `This is ${who} — would you like to visit this weekend? I can hold a slot 🗓`
   );
 }
 
@@ -115,7 +119,8 @@ export function suggestReplies(conv: Conversation): string[] {
   const s: string[] = [];
 
   if (!hasReplied) {
-    s.push(`Hi${hey(conv.name)}! ${BROKER.name} here from ${BROKER.agency} 👋 Happy to help you find the right home.`);
+    const b = activeBroker();
+    s.push(`Hi${hey(conv.name)}! ${b.name} here from ${b.agency} 👋 Happy to help you find the right home.`);
     s.push("Could you share your preferred area, BHK and budget? I'll send matched options right away.");
   }
 

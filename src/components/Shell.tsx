@@ -2,7 +2,7 @@
 
 import { useUI } from './ui-context';
 import { useStore, type Screen } from '@/lib/store';
-import { BROKER } from '@/lib/seed';
+import { activeBroker } from '@/lib/broker';
 import { cx } from '@/lib/util';
 
 const TABS: { s: Screen; label: string }[] = [
@@ -23,6 +23,7 @@ const TABS: { s: Screen; label: string }[] = [
 export function Shell({ onLogout }: { onLogout?: () => void }) {
   const { screen, nav } = useUI();
   const unread = useStore((s) => s.conversations.reduce((a, c) => a + c.unread, 0));
+  const broker = activeBroker();
 
   return (
     <div className="topnav">
@@ -40,13 +41,13 @@ export function Shell({ onLogout }: { onLogout?: () => void }) {
         <div className="who">
           <div
             className="avatar"
-            title={`${BROKER.name} — click to log out`}
+            title={`${broker.name} — click to log out`}
             style={{ cursor: onLogout ? 'pointer' : 'default' }}
             onClick={() => {
               if (onLogout && window.confirm('Log out of Brokly?')) onLogout();
             }}
           >
-            {BROKER.initials}
+            {broker.initials}
           </div>
         </div>
       </div>

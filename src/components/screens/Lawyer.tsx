@@ -5,7 +5,7 @@ import { useUI } from '../ui-context';
 import { useStore } from '@/lib/store';
 import { stampSale, stampRent } from '@/lib/stampduty';
 import { formatInr, parseRupees, bpsOf } from '@/lib/money';
-import { BROKER } from '@/lib/seed';
+import { activeBroker } from '@/lib/broker';
 import { commercialLease, type LeaseData } from '@/lib/legal';
 import { cx } from '@/lib/util';
 
@@ -28,18 +28,18 @@ function DeedModal({ d }: { d: DeedData }) {
   const title = d.type === 'rent' ? 'RENTAL AGREEMENT' : 'AGREEMENT TO SELL';
   const body =
     d.type === 'rent'
-      ? `This Rental Agreement is made on ${today} at ${BROKER.city} between ${A} ("Lessor") and ${B} ("Lessee").
+      ? `This Rental Agreement is made on ${today} at ${activeBroker().city} between ${A} ("Lessor") and ${B} ("Lessee").
 
-1. The Lessor lets to the Lessee the property: ${d.propTitle}, ${d.area}, ${BROKER.city}.
+1. The Lessor lets to the Lessee the property: ${d.propTitle}, ${d.area}, ${activeBroker().city}.
 2. The tenancy is for a term of ${d.term}, commencing on the date above.
 3. The Lessee shall pay a monthly rent of ${formatInr(d.amtPaise)}, payable in advance on or before the 5th of each month.
 4. The Lessee shall pay a refundable security deposit of ${formatInr(d.amtPaise * 10)}.
 5. The Lessee shall use the premises for residential purposes only and maintain it in good condition.
 6. Either party may terminate this agreement with one (1) month's written notice.
 7. This agreement is governed by the laws of Karnataka, India.`
-      : `This Agreement to Sell is made on ${today} at ${BROKER.city} between ${A} ("Seller") and ${B} ("Purchaser").
+      : `This Agreement to Sell is made on ${today} at ${activeBroker().city} between ${A} ("Seller") and ${B} ("Purchaser").
 
-1. The Seller agrees to sell the property: ${d.propTitle}, ${d.area}, ${BROKER.city}, free of encumbrances.
+1. The Seller agrees to sell the property: ${d.propTitle}, ${d.area}, ${activeBroker().city}, free of encumbrances.
 2. The total sale consideration is ${formatInr(d.amtPaise)}.
 3. The Purchaser has paid an advance/token of ${formatInr(bpsOf(d.amtPaise, 1000))}, receipt acknowledged.
 4. The balance shall be paid at the time of registration of the sale deed, within ${d.term}.
@@ -146,7 +146,7 @@ export function Lawyer() {
 
   const [dgType, setDgType] = useState<'rent' | 'sale'>('rent');
   const [dgProp, setDgProp] = useState('');
-  const [dgA, setDgA] = useState(BROKER.name);
+  const [dgA, setDgA] = useState(() => activeBroker().name);
   const [dgB, setDgB] = useState('');
   const [dgAmt, setDgAmt] = useState('55000');
   const [dgTerm, setDgTerm] = useState('11 months');
@@ -178,7 +178,7 @@ export function Lawyer() {
   function generateDeed() {
     const p = properties.find((x) => x.id === (dgProp || properties[0]?.id)) || {
       title: 'the Property',
-      area: BROKER.city,
+      area: activeBroker().city,
     };
     showModal(
       <DeedModal

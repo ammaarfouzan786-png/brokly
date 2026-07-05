@@ -23,8 +23,8 @@ import {
   seedLeads,
   seedConversations,
   seedCobroke,
-  BROKER,
 } from './seed';
+import { activeBroker } from './broker';
 
 export type Screen =
   | 'home' | 'inbox' | 'stock' | 'clients' | 'cobroke'
@@ -250,9 +250,11 @@ export const useStore = create<BroklyState>()(
           if (req) props = strongMatches(properties, req).map((m) => dto(m.p, m.score, m.p.id === opts?.newPropId));
         }
         if (typeof window === 'undefined') return;
+        const broker = activeBroker();
         const payload = {
           slug: link.slug, kind: link.kind, label: link.label,
-          brokerName: BROKER.agency, brokerScore: BROKER.score, props, created: link.created,
+          brokerName: broker.name, brokerAgency: broker.agency, brokerScore: broker.score,
+          props, created: link.created,
           // `updated` only moves past `created` on an auto-update, so the buyer
           // view can tell a fresh collection from one that just changed.
           updated: opts?.newPropId ? Date.now() : link.created,

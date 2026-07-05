@@ -56,11 +56,20 @@ export function LeadsLive({ initial }: { initial: Lead[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const live = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div className="sm muted" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ width: 9, height: 9, borderRadius: '50%', background: 'var(--brand)', boxShadow: '0 0 0 4px rgba(11,107,58,.15)' }} />
-        Live — new WhatsApp enquiries appear here instantly
+        <span
+          style={{
+            width: 9, height: 9, borderRadius: '50%',
+            background: live ? 'var(--brand)' : 'var(--gold)',
+            boxShadow: live ? '0 0 0 4px rgba(11,107,58,.15)' : '0 0 0 4px rgba(201,138,21,.15)',
+          }}
+        />
+        {live
+          ? 'Live — new WhatsApp enquiries appear here instantly'
+          : 'Demo — checking for new enquiries every 12s (connect Supabase for instant realtime)'}
       </div>
 
       {leads.length === 0 && (

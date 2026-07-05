@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useStore } from '@/lib/store';
 import { cx } from '@/lib/util';
-import { BROKER } from '@/lib/seed';
+import { activeBroker } from '@/lib/broker';
 
 const COLORS = ['#0B6B3A', '#06472A', '#171033', '#C98A15', '#2E72D2', '#0E1F18', '#B5314A', '#1F7A8C'];
 type Shape = 'rounded' | 'circle' | 'shield';
@@ -64,16 +64,19 @@ function avatarSVG(o: Kit) {
 export function Brand() {
   const toast = useStore((s) => s.toast);
   const [tab, setTab] = useState<BrandTab>('logo');
-  const [kit, setKit] = useState<Kit>({
-    name: BROKER.agency,
-    tag: 'Bengaluru real estate',
-    person: BROKER.name,
-    phone: '+91 98765 43210',
-    email: 'hello@ammarestates.in',
-    rera: 'PRM/KA/RERA/1251',
-    shape: 'rounded',
-    color: COLORS[0],
-    style: 'bric',
+  const [kit, setKit] = useState<Kit>(() => {
+    const b = activeBroker();
+    return {
+      name: b.agency,
+      tag: `${b.city} real estate`,
+      person: b.name,
+      phone: b.phone ? `+${b.phone.replace(/^\+/, '')}` : '+91 98765 43210',
+      email: b.email || `hello@${b.agency.toLowerCase().replace(/[^a-z0-9]/g, '')}.in`,
+      rera: b.rera || 'PRM/KA/RERA/1251',
+      shape: 'rounded',
+      color: COLORS[0],
+      style: 'bric',
+    };
   });
   const up = (k: keyof Kit, v: string) => setKit((o) => ({ ...o, [k]: v }));
 

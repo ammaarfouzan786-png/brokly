@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useUI } from './ui-context';
 import { useStore } from '@/lib/store';
 import { strongMatches } from '@/lib/matching';
-import { BROKER } from '@/lib/seed';
+import { activeBroker } from '@/lib/broker';
 import { BuyerHeader, BuyerCard, BuyerDetail, EnquiryForm } from './buyer-view';
 
 /** In-app "Open as buyer" / "Preview" — the phone-framed buyer experience,
@@ -30,7 +30,7 @@ export function BuyerOverlay() {
       <>
         <BuyerHeader
           preview={preview}
-          sharedBy={BROKER.agency}
+          sharedBy={activeBroker().agency}
           title="Your property"
           subtitle="Tap enquire to reach the broker"
           onClose={closeBuyer}
@@ -53,7 +53,7 @@ export function BuyerOverlay() {
         <>
           <BuyerHeader
             preview={preview}
-            sharedBy={BROKER.agency}
+            sharedBy={activeBroker().agency}
             title="Homes picked for you"
             subtitle="Tap a home to see details and enquire"
             onClose={closeBuyer}

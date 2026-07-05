@@ -1,0 +1,55 @@
+flowchart LR
+    subgraph CH["① Every place a lead is born"]
+        WAF["WhatsApp<br/>buyer message / broker forward"]:::wa
+        PORTAL["MagicBricks · 99acres<br/>Housing · OLX"]:::portal
+        IGD["Instagram<br/>DMs · reel comments"]:::ig
+        ADS["FB / IG Lead Ads"]:::ig
+        LNK["Brokly links<br/>smart collections · listing pages"]:::brk
+        MAN["Manual add<br/>call / walk-in"]:::brk
+    end
+
+    PORTAL -->|"lead notification email"| ALIAS["Broker's unique alias<br/>arnav-4821@leads.brokly.in<br/>set in portal OR Gmail auto-forward"]:::portal
+    ALIAS --> INB["POST /api/inbound/email<br/>Cloudflare Email Routing → webhook"]:::core
+    WAF --> WH["/api/webhook/whatsapp<br/>Meta Cloud API"]:::core
+    IGD --> IGW["/api/webhook/instagram<br/>same Meta app"]:::core
+    ADS --> IGW
+    LNK --> ENQ["/api/enquiry · /api/leads<br/>already live"]:::core
+    MAN --> ENQ
+
+    subgraph RT["② Lead Router — one pipeline for everything"]
+        NORM["Normalize to IncomingLead"]:::core
+        PARSE["Gemini parse<br/>buyer · phone · listing ref · intent"]:::ai
+        DEDUP["Buyer dedupe<br/>same phone/email → one buyer"]:::core
+        MATCH{"Property already<br/>on Brokly?"}:::dec
+        CREATE["Auto-create listing card<br/>reuses the AI listing engine"]:::ai
+        SCORE["AI score<br/>HOT / WARM / COLD"]:::ai
+    end
+
+    INB --> NORM
+    WH --> NORM
+    IGW --> NORM
+    ENQ --> NORM
+    NORM --> PARSE --> DEDUP --> MATCH
+    MATCH -->|"no — new card"| CREATE --> SCORE
+    MATCH -->|"yes — attach"| SCORE
+
+    subgraph OUT["③ One outcome, three actions"]
+        CARD["Lead card on dashboard<br/>Supabase + Realtime"]:::brk
+        NBRK["WhatsApp alert to broker<br/>lead context + quick actions"]:::wa
+        NBUY["WhatsApp first-touch to buyer<br/>utility template + Brokly link"]:::wa
+    end
+
+    SCORE --> CARD
+    SCORE --> NBRK
+    SCORE -->|"phone known"| NBUY
+
+    NBUY --> CONV["All further chat on WhatsApp<br/>buyer bot + broker inbox<br/>links auto-update with new stock"]:::wa
+    CONV --> DEAL["Visit → close<br/>commission · GST invoice · lawyer"]:::brk
+
+    classDef wa fill:#e3f6ea,stroke:#1fad55,stroke-width:1.5px,color:#0e1f18
+    classDef portal fill:#fbf0da,stroke:#c98a15,stroke-width:1.5px,color:#0e1f18
+    classDef ig fill:#fce7f1,stroke:#d6337a,stroke-width:1.5px,color:#0e1f18
+    classDef brk fill:#e4f2ea,stroke:#0b6b3a,stroke-width:1.5px,color:#0e1f18
+    classDef core fill:#e7f0fb,stroke:#2e72d2,stroke-width:1.5px,color:#0e1f18
+    classDef ai fill:#ece8fe,stroke:#6f58f0,stroke-width:1.5px,color:#0e1f18
+    classDef dec fill:#fce7e5,stroke:#e0473c,stroke-width:1.5px,color:#0e1f18

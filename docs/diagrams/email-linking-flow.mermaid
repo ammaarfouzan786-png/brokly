@@ -1,0 +1,28 @@
+flowchart TD
+    A["Broker signs up with just<br/>email + phone number"]:::brk --> MX["Brokly detects the provider<br/>MX lookup on the email"]:::core
+
+    MX -->|"Gmail / Google Workspace<br/>~95% of brokers"| G1["One tap — Continue with Google<br/>OAuth consent · read-only mail"]:::core
+    MX -->|"Outlook / Hotmail"| O1["One tap — Continue with Microsoft<br/>Graph Mail.Read consent"]:::core
+    MX -->|"other provider<br/>or OAuth declined"| F1["Personal lead alias<br/>arnav-4821@leads.brokly.in"]:::portal
+
+    G1 --> BF["Instant backfill — scan 90 days<br/>of portal emails<br/>'We found 23 leads in your inbox'"]:::ai
+    O1 --> BF
+    BF --> W["Live watch on new mail<br/>Gmail push via Pub/Sub<br/>2-min poll as fallback"]:::core
+    W --> FILT["Server-side sender filter<br/>only MB · 99acres · Housing · OLX<br/>personal mail never read"]:::core
+
+    F1 --> F2{"How to wire<br/>the alias?"}:::dec
+    F2 -->|"best — permanent"| F3["Set alias as notification email<br/>inside portal settings"]:::portal
+    F2 -->|"easiest — guided"| F4["Gmail auto-forward rule<br/>Brokly auto-confirms the<br/>verification code it receives"]:::portal
+    F3 --> INB["Inbound mail webhook<br/>Cloudflare Email Routing"]:::core
+    F4 --> INB
+
+    FILT --> RT["Lead Router<br/>Gemini parse → dedupe →<br/>match / auto-create card → score"]:::ai
+    INB --> RT
+    RT --> OUT["Lead card + WhatsApp alert to broker<br/>+ first-touch to buyer"]:::wa
+
+    classDef wa fill:#e3f6ea,stroke:#1fad55,stroke-width:1.5px,color:#0e1f18
+    classDef portal fill:#fbf0da,stroke:#c98a15,stroke-width:1.5px,color:#0e1f18
+    classDef brk fill:#e4f2ea,stroke:#0b6b3a,stroke-width:1.5px,color:#0e1f18
+    classDef core fill:#e7f0fb,stroke:#2e72d2,stroke-width:1.5px,color:#0e1f18
+    classDef ai fill:#ece8fe,stroke:#6f58f0,stroke-width:1.5px,color:#0e1f18
+    classDef dec fill:#fce7e5,stroke:#e0473c,stroke-width:1.5px,color:#0e1f18
